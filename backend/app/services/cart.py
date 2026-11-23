@@ -1,8 +1,6 @@
+import asyncio
 from datetime import datetime, timedelta
 from typing import Any, Optional
-
-from fastapi import HTTPException
-from prisma.enums import CartStatus
 
 from app.core.logging import get_logger
 from app.core.utils import generate_id
@@ -12,7 +10,9 @@ from app.schemas.cart import CartResponse
 from app.services.cache import CacheService
 from app.services.coupon import CouponService
 from app.services.shop_settings import ShopSettingsService
+from fastapi import HTTPException
 from prisma import Prisma
+from prisma.enums import CartStatus
 
 logger = get_logger(__name__)
 
@@ -35,8 +35,13 @@ class CartService:
     def _abandoned_cutoff(self) -> datetime:
         return datetime.utcnow() - timedelta(hours=ABANDONED_THRESHOLD_HOURS)
 
-    async def _with_computed_totals(self, cart) -> CartResponse:
-        cart_totals = await self.calculate_totals(cart=cart)
+    async def _with_computed_totals(self, cart, *, light: bool = False) -> CartResponse:
+        """`light=True` skips per-cart coupon re-validation (several queries per cart); use it for
+        admin list views where the stored discount is good enough."""
+        cart_totals = await self.calculate_totals(cart=cart, validate_coupon=not light)
+        if cart_totals is None:
+            raise HTTPException(
+                status_code=500, detail="Could not calculate cart totals")
 
         return CartResponse(
             id=cart.id,
@@ -66,21 +71,22 @@ class CartService:
     async def touch(self, cart_id: int) -> None:
         await self.db.cart.update(where={"id": cart_id}, data={"updated_at": datetime.utcnow()})
 
-    async def get_abandoned(self) -> list[Cart]:
+    async def get_abandoned(self, limit: int = 1000, include_relations: bool = False) -> list[Cart]:
+        """Abandoned carts, newest first, capped at `limit`. Relations are opt-in: callers that
+        only need ids (reminder jobs) shouldn't load every cart's items, variants and user."""
         where: dict = {
             "status": "ACTIVE",
             "updated_at": {"lt": self._abandoned_cutoff()},
             "items": {"some": {}},  # only carts that actually have items
         }
 
-        items = await self.db.cart.find_many(
+        return await self.db.cart.find_many(
             where=where,
             order={"updated_at": "desc"},
-            include={"items": {"include":{"variant": True}}, "user": True},
+            take=limit,
+            include={"items": {"include": {"variant": True}},
+                     "user": True} if include_relations else None,
         )
-
-        return items
-
 
     async def get_abandoned_paginated(
         self,
@@ -100,20 +106,28 @@ class CartService:
                 {"phone": {"contains": search}},
             ]
 
-        items = await self.db.cart.find_many(
-            where=where,
-            skip=skip,
-            take=limit,
-            order={"updated_at": "desc"},
-            include={"items": {"include":{"variant": True}}, "user": True},
+        items, total = await asyncio.gather(
+            self.db.cart.find_many(
+                where=where,
+                skip=skip,
+                take=limit,
+                order=[{"updated_at": "desc"}, {"id": "desc"}],
+                include={"items": {"include": {"variant": True}}, "user": True},
+            ),
+            self.db.cart.count(where=where),
         )
-        total = await self.db.cart.count(where=where)
         return items, total
 
-    async def get_by_id(self, id: int) -> Optional[Cart]:
-        return await self.db.cart.find_unique(
-            where={"id": id}, include={"items": True}
+    async def get_by_id(self, id: int, detailed: bool = False) -> Optional[Cart]:
+        """`detailed=True` also loads variants (needed to price the items), the user and the
+        shipping address, which the admin detail view renders."""
+        include = (
+            {"items": {"include": {"variant": True}},
+                "user": True, "shipping_address": True}
+            if detailed
+            else {"items": True}
         )
+        return await self.db.cart.find_unique(where={"id": id}, include=include)
 
     async def get_active_cart(
         self,
@@ -144,7 +158,8 @@ class CartService:
 
         if cart_number:
             cart = await self.db.cart.find_unique(
-                where={"cart_number": cart_number, "status": CartStatus.ACTIVE},
+                where={"cart_number": cart_number,
+                       "status": CartStatus.ACTIVE},
                 include=include_clause,
             )
             if cart:
@@ -173,8 +188,8 @@ class CartService:
             include=include_clause,
         )
 
-    async def calculate_totals(self, cart: Cart) -> None:
-        """Calculates and commits subtotal, tax, discounts, and wallet balances cleanly."""
+    async def calculate_totals(self, cart: Cart, validate_coupon: bool = True) -> dict[str, Any] | None:
+        """Calculates subtotal, tax, discounts and wallet-adjusted total. Returns None on failure."""
         logger.debug(f"Recalculating totals for cart ID: {cart.id}")
         try:
             tax_rate = float(await self.settings_srv.get("tax_rate"))
@@ -184,7 +199,10 @@ class CartService:
             )
             discount_amount = 0.0
 
-            if cart.coupon_id:
+            if cart.coupon_id and not validate_coupon:
+                # trust the stored value (list views)
+                discount_amount = float(cart.discount_amount or 0.0)
+            elif cart.coupon_id:
                 coupon = await self.coupon_srv.get_by_id(id=cart.coupon_id)
                 if coupon:
                     try:
@@ -273,10 +291,12 @@ class CartService:
                 )
 
                 if user_cart and guest_cart:
-                    user_items_map = {item.variant_id: item for item in user_cart.items}
+                    user_items_map = {
+                        item.variant_id: item for item in user_cart.items}
 
                     for guest_item in guest_cart.items:
-                        existing_item = user_items_map.get(guest_item.variant_id)
+                        existing_item = user_items_map.get(
+                            guest_item.variant_id)
                         if existing_item:
                             await tx.cartitem.update(
                                 where={"id": existing_item.id},
@@ -305,7 +325,12 @@ class CartService:
 
     async def apply_wallet_balance(self, cart: Cart, user: User) -> None:
         if not user.wallet_balance or user.wallet_balance <= 0:
-            raise HTTPException(status_code=400, detail="Wallet balance is empty")
+            raise HTTPException(
+                status_code=400, detail="Wallet balance is empty")
+
+        if (cart.wallet_used or 0.0) > 0:
+            raise HTTPException(
+                status_code=400, detail="Wallet balance is already applied to this cart")
 
         subtotal = cart.subtotal or 0.0
         tax = cart.tax or 0.0
@@ -314,6 +339,9 @@ class CartService:
 
         total_payable = max(subtotal + tax + shipping - discount, 0.0)
         wallet_to_use = min(user.wallet_balance, total_payable)
+        if wallet_to_use <= 0:
+            raise HTTPException(
+                status_code=400, detail="Nothing to pay with wallet balance")
         remaining_total = max(total_payable - wallet_to_use, 0.0)
 
         data: dict[str, float | str] = {
@@ -324,7 +352,23 @@ class CartService:
             data["payment_method"] = "WALLET"
 
         async with self.db.tx() as tx:
-            await tx.cart.update(where={"id": cart.id}, data=data)
+            # Claim the cart first: only one concurrent request can flip wallet_used 0 -> n.
+            claimed = await tx.cart.update_many(
+                where={"id": cart.id, "wallet_used": {"lte": 0}}, data=data
+            )
+            if claimed == 0:
+                raise HTTPException(
+                    status_code=400, detail="Wallet balance is already applied to this cart")
+
+            # Debit only if the balance still covers it, so it can never go negative.
+            debited = await tx.user.update_many(
+                where={"id": user.id, "wallet_balance": {"gte": wallet_to_use}},
+                data={"wallet_balance": {"decrement": wallet_to_use}},
+            )
+            if debited == 0:
+                raise HTTPException(
+                    status_code=400, detail="Insufficient wallet balance")
+
             await tx.wallettransaction.create(
                 data={
                     "user": {"connect": {"id": user.id}},
@@ -333,10 +377,6 @@ class CartService:
                     "type": "WITHDRAWAL",
                     "reference_id": cart.cart_number,
                 }
-            )
-            await tx.user.update(
-                where={"id": user.id},
-                data={"wallet_balance": {"decrement": wallet_to_use}},
             )
 
     async def remove_wallet_balance(self, cart: Cart, user: User) -> None:
@@ -347,6 +387,15 @@ class CartService:
             )
 
         async with self.db.tx() as tx:
+            # Release the reservation exactly once, even if the request is repeated concurrently.
+            released = await tx.cart.update_many(
+                where={"id": cart.id, "wallet_used": {"gt": 0}},
+                data={"wallet_used": 0.0, "payment_method": None},
+            )
+            if released == 0:
+                raise HTTPException(
+                    status_code=400, detail="No wallet balance applied to this cart")
+
             await tx.user.update(
                 where={"id": user.id},
                 data={"wallet_balance": {"increment": wallet_used}},
@@ -359,9 +408,6 @@ class CartService:
                     "type": "REVERSAL",
                     "reference_id": cart.cart_number,
                 }
-            )
-            await tx.cart.update(
-                where={"id": cart.id}, data={"wallet_used": 0.0, "payment_method": None}
             )
 
     async def update_contact(self, user_id, phone) -> None:

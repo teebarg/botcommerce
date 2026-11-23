@@ -1,23 +1,47 @@
 import asyncio
+import fnmatch
 import inspect
 import json
 import time
+import weakref
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from functools import wraps
 from typing import Any, Callable, Optional, Union
 
-from fastapi import Request
-from redis.asyncio import Redis  # Explicit type hints for the team
-
 from app.core.logging import get_logger
 from app.lib.cache import set_public_cache
 from app.services.websocket import manager
+from fastapi import Request
+from redis.asyncio import Redis  # Explicit type hints for the team
 
 logger = get_logger(__name__)
 
 DEFAULT_EXPIRATION = int(timedelta(days=7).total_seconds())
 L1_INVALIDATE_CHANNEL = "cache:invalidate"
+# Carries the keys/tags browsers should refetch. Published once; every worker's
+# listener forwards it to its own websocket clients, so realtime invalidation reaches
+# every connected user no matter which worker handled the write.
+WS_INVALIDATE_CHANNEL = "ws:invalidate"
+
+# Redis keys that live in the same DB but are NOT cache entries. clear_cache() must
+# never delete these (sessions, rate-limit counters, analytics, chat mappings, and the
+# recommendation lists the worker builds).
+_PROTECTED_KEY_PATTERNS = (
+    "session:*",
+    "rate_limit:*",
+    "analytics:*",
+    "chat_session:*",
+    "chat_user:*",
+    "user:*:history",
+    "product:*:similar",
+    "sitemap",
+)
+
+_background_tasks: set[asyncio.Task] = set()
+# One in-flight computation per cache key (per process) so a cold key isn't recomputed
+# by every concurrent request.
+_key_locks: "weakref.WeakValueDictionary[str, asyncio.Lock]" = weakref.WeakValueDictionary()
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -77,22 +101,32 @@ async def run_l1_invalidation_listener(redis: Redis, l1: L1Cache) -> None:
     sibling worker's local cache in sync with it. Must be started in
     every worker, not just one."""
     pubsub = redis.pubsub()
-    await pubsub.subscribe(L1_INVALIDATE_CHANNEL)
+    await pubsub.subscribe(L1_INVALIDATE_CHANNEL, WS_INVALIDATE_CHANNEL)
     try:
         async for message in pubsub.listen():
             if message["type"] != "message":
                 continue
             try:
+                channel = message["channel"]
+                if isinstance(channel, bytes):
+                    channel = channel.decode()
                 payload = json.loads(message["data"])
-                if payload == "__ALL__":
+                if channel == WS_INVALIDATE_CHANNEL:
+                    # Fan out in the background so a slow client can never delay L1 eviction.
+                    task = asyncio.create_task(
+                        manager.broadcast_to_all(data={"keys": payload}, message_type="invalidate")
+                    )
+                    _background_tasks.add(task)
+                    task.add_done_callback(_background_tasks.discard)
+                elif payload == "__ALL__":
                     l1.clear()
                 else:
                     l1.delete(*payload)
             except Exception as e:
                 logger.error(f"[L1Cache] Bad invalidation message: {e}", exc_info=True)
     finally:
-        await pubsub.unsubscribe(L1_INVALIDATE_CHANNEL)
-        await pubsub.close()
+        await pubsub.unsubscribe(L1_INVALIDATE_CHANNEL, WS_INVALIDATE_CHANNEL)
+        await pubsub.aclose()
 
 
 class CacheService:
@@ -100,16 +134,28 @@ class CacheService:
         self.redis = redis
         self.l1 = l1  # None disables L1 for this call site (e.g. sessions)
 
-    async def clear_cache(self) -> None:
-        """Clear the entire Redis database and every process's L1 cache."""
+    async def clear_cache(self) -> int | None:
+        """Delete every cache entry (and every process's L1) while leaving sessions,
+        rate-limit counters and other non-cache data in the same Redis DB alone.
+        Returns the number of keys deleted."""
         try:
-            result = await self.redis.flushdb()
+            deleted = 0
+            batch: list[str] = []
+            async for key in self.redis.scan_iter(match="*", count=500):
+                if any(fnmatch.fnmatchcase(key, pattern) for pattern in _PROTECTED_KEY_PATTERNS):
+                    continue
+                batch.append(key)
+                if len(batch) >= 500:
+                    deleted += await self.redis.delete(*batch)
+                    batch.clear()
+            if batch:
+                deleted += await self.redis.delete(*batch)
             if self.l1 is not None:
                 self.l1.clear()
             await self.redis.publish(L1_INVALIDATE_CHANNEL, json.dumps("__ALL__"))
-            return result
+            return deleted
         except Exception as e:
-            logger.error(f"[Cache] Read failure: {e}", exc_info=True)
+            logger.error(f"[Cache] Clear failure: {e}", exc_info=True)
             return None
 
     async def get(self, key: str) -> Optional[Any]:
@@ -218,11 +264,13 @@ class CacheService:
                 logger.error(f"[Cache] L1 invalidation publish failed: {e}", exc_info=True)
 
         if invalidated_keys:
-            await manager.broadcast_to_all(
-                data={"keys": list(set(invalidated_keys))},
-                message_type="invalidate",
-            )
-            await asyncio.sleep(0.01)
+            # Publish once; each worker's listener pushes it to its own websocket clients.
+            # (Doing the fan-out here made every write wait on every connected socket.)
+            browser_keys = list(set(invalidated_keys))
+            try:
+                await self.redis.publish(WS_INVALIDATE_CHANNEL, json.dumps(browser_keys))
+            except Exception as e:
+                logger.error(f"[Cache] Websocket invalidation publish failed: {e}", exc_info=True)
 
 
 def cacheable(
@@ -264,18 +312,29 @@ def cacheable(
             if cached_data is not None:
                 return cached_data
 
-            result = await func(*args, **kwargs)
+            lock = _key_locks.get(raw_key)
+            if lock is None:
+                lock = asyncio.Lock()
+                _key_locks[raw_key] = lock
 
-            resolved_tags = []
-            if callable(tags):
-                sig = inspect.signature(tags)
-                filtered_tags_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
-                resolved_tags = tags(**filtered_tags_kwargs)
-            elif isinstance(tags, list):
-                resolved_tags = tags
+            async with lock:
+                # Someone else may have filled the key while we waited for the lock.
+                cached_data = await cache.get(raw_key)
+                if cached_data is not None:
+                    return cached_data
 
-            await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=resolved_tags)
+                result = await func(*args, **kwargs)
 
-            return result
+                resolved_tags = []
+                if callable(tags):
+                    sig = inspect.signature(tags)
+                    filtered_tags_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+                    resolved_tags = tags(**filtered_tags_kwargs)
+                elif isinstance(tags, list):
+                    resolved_tags = tags
+
+                await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=resolved_tags)
+
+                return result
         return wrapper
     return decorator
