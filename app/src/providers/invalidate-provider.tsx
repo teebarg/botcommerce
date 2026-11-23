@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRouteContext } from "@tanstack/react-router";
-import { useWebSocket, useWebSocketMessage } from "pulsews";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useWebSocket, useWebSocketMessage } from "./realtime-provider";
 import { useCart } from "./cart-provider";
 
 function parseEventKey(eventKey: string): string[] {
@@ -17,29 +17,46 @@ function parseEventKeys(eventKeys: string[]): string[][] {
     return eventKeys.map(parseEventKey);
 }
 
+// A broadcast reaches every connected visitor at once. For shared catalog data we spread the
+// refetches over a few seconds so one admin edit doesn't make every open tab hit the API together.
+// The user's own data (cart, orders, wallet, ...) is refreshed immediately.
+const CATALOG_JITTER_MS = 3000;
+const IMMEDIATE_KEYS = new Set(["cart", "orders", "order", "order-timeline", "wallet", "chat", "notifications", "user", "activity"]);
+
 export function InvalidateProvider({ children }: { children: React.ReactNode }) {
-    const [isMounted, setIsMounted] = useState<boolean>(false);
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
-    if (!isMounted) {
-        return <>{children}</>;
-    }
-
     return <InvalidateProviderInner>{children}</InvalidateProviderInner>;
 }
 
 function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const pathname = location.pathname;
-    const { isAuthenticated, userId, user } = useRouteContext({ strict: false });
+    const { isAuthenticated } = useRouteContext({ strict: false });
     const { cart } = useCart();
     const queryClient = useQueryClient();
     const { send, isConnected } = useWebSocket();
     const prevConnectedRef = useRef<boolean>(false);
     const hasConnectedBeforeRef = useRef<boolean>(false);
+    const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+    useEffect(() => {
+        const timers = timersRef.current;
+        return () => {
+            timers.forEach(clearTimeout);
+            timers.clear();
+        };
+    }, []);
+
+    const invalidate = (queryKey: string[]) => {
+        if (IMMEDIATE_KEYS.has(queryKey[0])) {
+            queryClient.invalidateQueries({ queryKey });
+            return;
+        }
+        const timer = setTimeout(() => {
+            timersRef.current.delete(timer);
+            queryClient.invalidateQueries({ queryKey });
+        }, Math.random() * CATALOG_JITTER_MS);
+        timersRef.current.add(timer);
+    };
 
     useWebSocketMessage(
         (message) => {
@@ -52,7 +69,7 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
                     }
                     return;
                 }
-                queryClient.invalidateQueries({ queryKey: keySegments });
+                invalidate(keySegments);
             };
 
             if (message.key) {
@@ -68,13 +85,7 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (isAuthenticated && isConnected && !prevConnectedRef.current) {
-            send(
-                JSON.stringify({
-                    type: "init",
-                    id: userId,
-                    email: user?.email,
-                })
-            );
+            send(JSON.stringify({ type: "init" }));
             if (hasConnectedBeforeRef.current) {
                 queryClient.invalidateQueries({ queryKey: ["orders"] });
                 queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -84,7 +95,7 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
             hasConnectedBeforeRef.current = true;
         }
         prevConnectedRef.current = isConnected;
-    }, [isAuthenticated, isConnected, send, user]);
+    }, [isAuthenticated, isConnected, send, queryClient]);
 
     useEffect(() => {
         if (isConnected) {

@@ -3,7 +3,7 @@ import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Check, Maximize2, Plus } from "lucide-react";
 import { AddToCartButton } from "./AddToCartButton";
 import { defaultVariant, getPriceInfo, productOptions } from "@/lib/variant";
@@ -20,11 +20,12 @@ interface ProductCardProps {
     selected?: boolean;
     onSelect?: () => void;
     onChoose?: () => void;
+    priority?: boolean;
 }
 
 type FitMode = "cover" | "contain";
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, selectable = false, selected = false, onSelect, onChoose }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, selectable = false, selected = false, onSelect, onChoose, priority = false }) => {
     const { attributes } = useProductAttributes(product?.variants);
     const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
@@ -33,14 +34,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
     const outOfStock = !product.in_stock;
     const showDiscountBadge = !outOfStock && hasDiscount;
 
-    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        const { naturalWidth, naturalHeight } = e.currentTarget;
+    const applyLoadedImage = useCallback((img: HTMLImageElement) => {
+        const { naturalWidth, naturalHeight } = img;
         if (naturalWidth && naturalHeight) {
             const isLandscape = naturalWidth > naturalHeight;
             setFitMode(isLandscape ? "contain" : "cover");
         }
         setMediaLoaded(true);
-    };
+    }, []);
+
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => applyLoadedImage(e.currentTarget);
+
+    const attachImage = useCallback(
+        (node: HTMLImageElement | null) => {
+            if (node?.complete && node.naturalWidth > 0) applyLoadedImage(node);
+        },
+        [applyLoadedImage]
+    );
 
     const variant = useMemo(() => defaultVariant(product), [product]);
     const hasChoices = productOptions(product).length > 0 && (product.variants?.length ?? 0) > 1;
@@ -57,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                 }}
                 className={cn("relative scroll-mt-20 animate-in fade-in slide-in-from-bottom-2 duration-500", outOfStock ? "opacity-60 grayscale" : "")}
             >
-                <LazyImage src={product.image} alt={product.name} aspect="4/5" />
+                <LazyImage src={product.image} alt={product.name} aspect="4/5" priority={priority} />
                 {outOfStock && (
                     <div className="absolute inset-0 flex items-center justify-center">
                         <span className="bg-foreground text-background text-xs font-medium px-3.5 py-1.5 rounded-full tracking-wide">Sold out</span>
@@ -133,10 +143,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                 >
                     {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
                     <img
+                        ref={attachImage}
                         alt={product?.name || ""}
                         src={product?.image}
                         onLoad={handleImageLoad}
-                        loading="lazy"
+                        loading={priority ? "eager" : "lazy"}
+                        fetchPriority={priority ? "high" : "auto"}
                         decoding="async"
                         className={cn(
                             "w-full h-full transition-opacity duration-500",

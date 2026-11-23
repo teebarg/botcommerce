@@ -13,7 +13,7 @@ import { api } from "@/utils/api";
 import { cn } from "@/utils/cn";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
-import { useWebSocketMessage } from "pulsews";
+import { useWebSocketMessage } from "@/providers/realtime-provider";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -186,22 +186,6 @@ function RouteComponent() {
                     selectedCount={selectedImages.size}
                     selectedImageIds={Array.from(selectedImages)}
                     selectedProductIds={selectedProductIds}
-                    selectedProducts={Array.from(
-                        new Map(
-                            items
-                                .filter((img) => selectedImages.has(img.id) && img.product_id)
-                                .map((img) => [
-                                    img.product_id!,
-                                    {
-                                        id: img.product_id!,
-                                        name: img.product?.name || `Product #${img.product_id}`,
-                                        imageId: img.id,
-                                        options: img.product?.options ?? [],
-                                        variants: img.product?.variants ?? [],
-                                    },
-                                ])
-                        ).values()
-                    )}
                     onClearSelection={() => setSelectedImages(new Set())}
                     onDelete={handleBulkDelete}
                 />

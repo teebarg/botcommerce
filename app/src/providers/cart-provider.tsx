@@ -29,14 +29,14 @@ export const useCart = () => {
                 isLoading: true,
                 error: null,
                 cartCount: 0,
-                addToCart: () => {},
-                removeFromCart: () => {},
-                updateQuantity: () => {},
+                addToCart: () => { },
+                removeFromCart: () => { },
+                updateQuantity: () => { },
                 wishlist: [],
-                toggleWishlist: () => {},
+                toggleWishlist: () => { },
                 isWishlisted: () => false,
                 cartOpen: false,
-                setCartOpen: () => {},
+                setCartOpen: () => { },
             };
         }
         throw new Error("useCart must be used within a CartProvider");
@@ -47,38 +47,33 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: cart, isLoading, error } = useMyCart();
-    const addToCartMutation = useAddToCart();
-    const updateQuantityMutation = useChangeCartQuantity();
-    const deleteItemMutation = useDeleteCartItem();
+    const { mutateAsync: addItem } = useAddToCart();
+    const { mutateAsync: changeQuantity } = useChangeCartQuantity();
+    const { mutateAsync: deleteItem } = useDeleteCartItem();
     const [wishlist, setWishlist] = useState<number[]>([]);
     const [cartOpen, setCartOpen] = useState<boolean>(false);
 
     const addToCart = useCallback(
         async (variantId: number, quantity = 1) => {
-            await addToCartMutation.mutateAsync({
-                variant_id: variantId,
-                quantity,
-            });
-
+            await addItem({ variant_id: variantId, quantity });
             setCartOpen(true);
         },
-        [addToCartMutation]
+        [addItem]
     );
 
     const updateQuantity = useCallback(
         async (id: number, quantity = 1) => {
-            await updateQuantityMutation.mutateAsync({ item_id: id, quantity });
+            await changeQuantity({ item_id: id, quantity });
             setCartOpen(true);
         },
-        [addToCartMutation]
+        [changeQuantity]
     );
 
     const removeFromCart = useCallback(
         async (id: number) => {
-            await deleteItemMutation.mutateAsync(id);
-            setCartOpen(true);
+            await deleteItem(id);
         },
-        [deleteItemMutation]
+        [deleteItem]
     );
 
     const toggleWishlist = useCallback((id: number) => {

@@ -32,6 +32,20 @@ interface LoadState {
 
 const FALLBACK_IMAGE_URL = `${APP_URL}/placeholder.jpg`;
 
+/**
+ * Optional responsive images. Set VITE_IMAGE_RESIZE_BASE to an image-resizing endpoint that accepts
+ * `<base>/width=<w>,quality=<q>,format=auto/<absolute source url>` (Cloudflare Image Resizing's
+ * `https://your-zone/cdn-cgi/image` does). When it is unset nothing changes: the original URL is
+ * used and no srcset is emitted, so this is safe to ship before the CDN is configured.
+ */
+const RESIZE_BASE = (import.meta.env.VITE_IMAGE_RESIZE_BASE as string | undefined)?.replace(/\/$/, "");
+const SRCSET_WIDTHS = [320, 480, 640, 960, 1280];
+
+function buildSrcSet(source: string, quality: number): string | undefined {
+    if (!RESIZE_BASE || !/^https?:\/\//.test(source)) return undefined;
+    return SRCSET_WIDTHS.map((w) => `${RESIZE_BASE}/width=${w},quality=${quality},format=auto/${source} ${w}w`).join(", ");
+}
+
 const Image = React.forwardRef<HTMLImageElement, ImageProps>(
     (
         {
@@ -41,8 +55,9 @@ const Image = React.forwardRef<HTMLImageElement, ImageProps>(
             originHeight,
             focalPointX,
             focalPointY,
-            quality = 90,
+            quality = 80,
             onError,
+            sizes,
             className: originalClassName,
             ...props
         },
@@ -82,7 +97,20 @@ const Image = React.forwardRef<HTMLImageElement, ImageProps>(
 
         const isErrorMode = mode === IMAGE_LOAD_MODE.FALLBACK;
         const imageSrc = isErrorMode ? FALLBACK_IMAGE_URL : src;
-        return <img ref={ref} src={imageSrc} {...imageProps} data-error-image={isErrorMode ? "" : undefined} />;
+        const srcSet = isErrorMode ? undefined : buildSrcSet(src, quality);
+        return (
+            <img
+                ref={ref}
+                src={imageSrc}
+                srcSet={srcSet}
+                sizes={srcSet ? (sizes ?? "100vw") : undefined}
+                width={props.width ?? originWidth}
+                height={props.height ?? originHeight}
+                decoding="async"
+                {...imageProps}
+                data-error-image={isErrorMode ? "" : undefined}
+            />
+        );
     }
 );
 

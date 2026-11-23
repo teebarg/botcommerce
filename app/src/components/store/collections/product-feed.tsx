@@ -72,10 +72,11 @@ export function ProductFeed({ params }: Props) {
                             view === "list" ? "grid-cols-1" : "grid-cols-2"
                         )}
                     >
-                        {products.map((product: ProductSearch) => (
+                        {products.map((product: ProductSearch, index: number) => (
                             <ProductCard
                                 key={product.id}
                                 product={product}
+                                priority={index < 4}
                                 onClick={() => handleProductClick(product)}
                                 selectable={quick}
                                 selected={ids.has(product.id)}

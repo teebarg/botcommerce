@@ -1,12 +1,11 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext, redirect, useLoaderData } from "@tanstack/react-router";
 import { Toaster } from "sonner";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import { seo } from "@/utils/seo";
 import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
-import { WebSocketProvider } from "pulsews";
+import { RealtimeProvider } from "@/providers/realtime-provider";
 import appCss from "@/styles.css?url";
 import { ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
@@ -14,10 +13,10 @@ import { InvalidateProvider } from "@/providers/invalidate-provider";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { AppSession } from "@/utils/session";
-import { APP_URL, getSessionId } from "@/utils";
+import { APP_URL } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
 import { useSettingsQuery } from "@/hooks/useGeneric";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { authQueryOptions } from "@/hooks/useUser";
@@ -53,7 +52,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         return {
             meta: [
                 { charSet: "utf-8" },
-                { name: "viewport", content: "width=device-width, initial-scale=1" },
                 { name: "mobile-web-app-capable", content: "yes" },
                 { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
                 ...seo({
@@ -92,13 +90,9 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const [localSessionId, setLocalSessionId] = useState<string | null>(null);
     const loaderData = useLoaderData({ from: Route.id }) as any;
     const config = loaderData?.config ?? {};
 
-    useEffect(() => {
-        setLocalSessionId(getSessionId());
-    }, []);
     return (
         <html suppressHydrationWarning>
             <head>
@@ -107,7 +101,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <link rel="manifest" href="/manifest.webmanifest" />
                 <script
@@ -131,16 +125,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 <Suspense fallback={null}>
                                     <PushPermission />
                                 </Suspense>
-                                {localSessionId && (
-                                    <WebSocketProvider
-                                        url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
-                                        debug={true}
-                                        onOpen={() => console.log("WebSocket connected!")}
-                                        onClose={() => console.log("WebSocket disconnected!")}
-                                    >
-                                        <InvalidateProvider>{children}</InvalidateProvider>
-                                    </WebSocketProvider>
-                                )}
+                                <RealtimeProvider url={`${import.meta.env.VITE_WS}/api/ws/`}>
+                                    <InvalidateProvider>{children}</InvalidateProvider>
+                                </RealtimeProvider>
                             </div>
                             <PWABadge />
                             <ImpersonationBanner />
@@ -160,10 +147,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     }}
                 />
                 {import.meta.env.MODE !== "production" && (
-                    <>
-                        {/* <ReactQueryDevtools buttonPosition="top-left" initialIsOpen={false} /> */}
-                        <SafeAreaDebug />
-                    </>
+                    <SafeAreaDebug />
                 )}
                 {process.env.NODE_ENV === "production" && <Analytics />}
                 <Scripts />

@@ -15,9 +15,6 @@ MAX_PATH_LEN = 200
 
 async def _authenticated_session(ws: WebSocket) -> dict | None:
     """The logged-in session behind this socket, from the session cookie.
-
-    Identity is never taken from the client's own message: a client could otherwise
-    claim any user id (or admin status) and receive that user's realtime events.
     """
     session_id = ws.cookies.get("session_id")
     if not session_id:

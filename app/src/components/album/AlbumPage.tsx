@@ -91,10 +91,11 @@ export default function AlbumPage({ data }: AlbumPageProps) {
             <main className="mx-auto max-w-xl w-full">
                 {view === "list" ? (
                     <div>
-                        {data.products.map((product: ProductSearch) => (
+                        {data.products.map((product: ProductSearch, index: number) => (
                             <ProductCard
                                 key={product.id}
                                 product={product}
+                                priority={index < 4}
                                 selectable={true}
                                 selected={ids.has(product.id)}
                                 onSelect={() => toggle(toSelectedItem(product))}

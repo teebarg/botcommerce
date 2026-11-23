@@ -3,13 +3,6 @@ import { getSessionId } from "@/utils";
 
 /**
  * Realtime (websocket) layer.
- *
- * Why this exists instead of using pulsews' <WebSocketProvider> directly:
- *  - The session id lives in localStorage, so it is only known after mount. Gating the provider on it
- *    meant the *entire app* (`children`) was not rendered on the server, and the tree changed shape
- *    right after hydration. Here the provider always renders `children` in the same position; the
- *    socket itself is opened by a separate, render-nothing component once the id is known.
- *  - Consumers get a safe no-op context during SSR / before the socket exists, so they never throw.
  */
 
 type Handler = (data: any) => void;
@@ -87,11 +80,6 @@ const BASE_RETRY_MS = 3_000;
 const MAX_RETRY_MS = 30_000;
 const MAX_ATTEMPTS = 10;
 
-/**
- * Owns the actual WebSocket: connects, heartbeats, and reconnects with backoff. Renders nothing.
- * (Written against the native WebSocket so it survives React StrictMode's mount/unmount/mount
- * cycle, which pulsews' hook does not.)
- */
 function SocketConnector({
     url,
     onMessage,
@@ -180,12 +168,10 @@ function SocketConnector({
     return null;
 }
 
-/** Drop-in replacement for pulsews' `useWebSocket`; safe on the server and before the socket opens. */
 export function useWebSocket(): RealtimeContextValue {
     return useContext(RealtimeContext);
 }
 
-/** Drop-in replacement for pulsews' `useWebSocketMessage`. */
 export function useWebSocketMessage(handler: Handler, deps: React.DependencyList = []) {
     const { subscribe } = useWebSocket();
     const handlerRef = useRef(handler);

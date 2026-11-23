@@ -60,7 +60,6 @@
         "date-fns": "^4.1.0",
         "lucide-react": "^0.544.0",
         "nitro": "latest",
-        "pulsews": "1.0.2",
         "react": "^19.2.0",
         "react-day-picker": "^10.0.1",
         "react-dom": "^19.2.0",

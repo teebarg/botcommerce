@@ -8,6 +8,18 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response";
 const API_BASE = self.location.origin;
 const OFFLINE_SHELL = "/";
 
+const API_ORIGIN = (() => {
+    try {
+        return new URL(import.meta.env.VITE_API_URL).origin;
+    } catch {
+        return null;
+    }
+})();
+
+// Only public catalog data may be cached by the service worker.
+const PUBLIC_API = /^\/(api\/)?(category|collection|faq|album|product)(\/|$)/;
+const PRIVATE_API = /\/(recommend|review-status)(\/|$)/;
+
 precacheAndRoute(self.__WB_MANIFEST);
 
 registerRoute(
@@ -27,6 +39,7 @@ registerRoute(
             new CacheableResponsePlugin({
                 statuses: [0, 200],
             }),
+            new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 10 * 60 }),
         ],
     })
 );
@@ -51,31 +64,45 @@ registerRoute(
     new StaleWhileRevalidate({
         cacheName: "image-cache",
         plugins: [
+            new CacheableResponsePlugin({ statuses: [0, 200] }),
             new ExpirationPlugin({
-                maxEntries: 1500,
-                maxAgeSeconds: 30 * 24 * 60 * 120,
+                maxEntries: 300,
+                maxAgeSeconds: 30 * 24 * 60 * 60,
             }),
         ],
     })
 );
 
-// Handles offline fallback logic
+// Page navigations
 registerRoute(
-    ({ request, url }) => {
-        const isNavigation = request.mode === "navigate";
-        const isApiRequest = url.pathname.startsWith("/api/") || url.hostname === "api.revoque.com.ng" || url.hostname === "api.shop.localhost";
-
-        return isNavigation || isApiRequest;
-    },
+    ({ request }) => request.mode === "navigate",
     new NetworkFirst({
-        cacheName: "api-nav-cache",
+        cacheName: "pages-cache",
         networkTimeoutSeconds: 5,
         plugins: [
+            new ExpirationPlugin({ maxEntries: 30, maxAgeSeconds: 24 * 60 * 60 }),
             {
                 handlerDidError: async () => {
                     return Response.error();
                 },
             },
+        ],
+    })
+);
+
+// Public catalog API: short network timeout (slow mobile networks shouldn't wait 5s), cached copy as fallback.
+registerRoute(
+    ({ request, url }) => {
+        if (request.method !== "GET") return false;
+        const isApi = url.pathname.startsWith("/api/") || (API_ORIGIN !== null && url.origin === API_ORIGIN);
+        return isApi && PUBLIC_API.test(url.pathname) && !PRIVATE_API.test(url.pathname);
+    },
+    new NetworkFirst({
+        cacheName: "api-public-cache",
+        networkTimeoutSeconds: 3,
+        plugins: [
+            new CacheableResponsePlugin({ statuses: [200] }),
+            new ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 24 * 60 * 60 }),
         ],
     })
 );
@@ -136,7 +163,7 @@ self.addEventListener("notificationclick", (event) => {
             body: JSON.stringify({
                 event: eventType,
             }),
-        }).catch(() => {})
+        }).catch(() => { })
     );
 
     if (action === "view") {
@@ -155,7 +182,7 @@ self.addEventListener("notificationclose", (event) => {
             body: JSON.stringify({
                 event: "push_message_clicked",
             }),
-        }).catch(() => {})
+        }).catch(() => { })
     );
 });
 
@@ -163,6 +190,9 @@ self.addEventListener("notificationclose", (event) => {
 self.addEventListener("message", (event) => {
     if (event.data && event.data.type === "SKIP_WAITING") {
         self.skipWaiting();
+    }
+    if (event.data && event.data.type === "CLEAR_USER_CACHES") {
+        event.waitUntil(Promise.all(["pages-cache", "ts-server-functions-cache"].map((name) => caches.delete(name))));
     }
 });
 
