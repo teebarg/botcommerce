@@ -1,16 +1,30 @@
 import type React from "react";
 import { currency } from "@/utils";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight, MessageCircle, Shield } from "lucide-react";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/utils/cn";
 import { useCart } from "@/providers/cart-provider";
+import { useConfig } from "@/providers/store-provider";
+import { variantLabel } from "@/lib/variant";
 
 const CartSummary: React.FC<{ className?: string; showSecured?: boolean }> = ({ className, showSecured = false }) => {
     const router = useRouter();
     const routerState = useRouterState();
     const { cart } = useCart();
+    const { whatsapp } = useConfig();
     const path = routerState.location.pathname;
+
+    const orderViaWhatsApp = () => {
+        if (!cart?.items.length || !whatsapp) return;
+        const lines = cart.items.map((item, index) => {
+            const details = variantLabel(item.variant);
+            const name = details ? `${item.name} (${details})` : item.name;
+            return `${index + 1}. ${name} × ${item.quantity} — ${currency(item.variant.price * item.quantity)}\n${window.location.origin}/products/${item.slug}`;
+        });
+        const message = `Hello! I'd like to order these items:\n\n${lines.join("\n\n")}\n\nSubtotal: ${currency(cart.subtotal)}\n\nPlease confirm availability and delivery fee. Thank you!`;
+        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    };
 
     return (
         <div className={cn("rounded-xl border bg-card overflow-hidden", className)}>
@@ -46,15 +60,26 @@ const CartSummary: React.FC<{ className?: string; showSecured?: boolean }> = ({ 
                 </div>
             </div>
 
-            {path !== "/checkout" && (
-                <button
-                    onClick={() => router.navigate({ to: "/checkout" })}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
-                >
-                    Proceed to checkout
-                    <ArrowRight className="w-4 h-4" />
-                </button>
-            )}
+            {path !== "/checkout" && cart?.items.length ? (
+                <div className="grid gap-2 p-3 pt-0">
+                    <button
+                        onClick={() => router.navigate({ to: "/checkout" })}
+                        className="w-full flex items-center justify-center gap-2 rounded-lg py-3 bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                        Proceed to checkout
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={orderViaWhatsApp}
+                        disabled={!whatsapp}
+                        className="w-full flex items-center justify-center gap-2 rounded-lg border border-emerald-700 py-3 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <MessageCircle className="w-4 h-4" />
+                        Order via WhatsApp
+                    </button>
+                </div>
+            ) : null}
 
             {showSecured && (
                 <div className="flex items-center gap-2 px-4 py-2.5 border-t">

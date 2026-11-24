@@ -1,6 +1,6 @@
 import { useSearch } from "@tanstack/react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ChevronDown, MessageCircle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,7 +14,6 @@ import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { currency, debounce } from "@/utils";
 import { DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE } from "@/utils/constants";
 import { cn } from "@/utils/cn";
-import { useFeedUi } from "@/hooks/useFeedUi";
 import { productFeedInfiniteQuery } from "@/queries/user.queries";
 import type { FeedQuery } from "@/schemas";
 
@@ -114,7 +113,6 @@ const getColorValue = (value: string) => {
 
 export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose }, ref) => {
     const search = useSearch({ strict: false }) as Record<string, unknown>;
-    const { quick, setQuick } = useFeedUi();
     const { updateQuery } = useUpdateQuery();
     const { data: categories } = useCategories();
     const { data: collections } = useCollections();
@@ -219,16 +217,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
 
     return (
         <div className="space-y-6 pb-2">
-            <button
-                type="button"
-                onClick={() => setQuick(!quick)}
-                aria-pressed={quick}
-                className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors", quick ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground")}
-            >
-                <MessageCircle className="h-4 w-4" />
-                {quick ? "Quick order: on" : "Order via WhatsApp"}
-            </button>
-
             <div className="flex flex-wrap gap-2">
                 {collections?.map((collection) => (
                     <Badge key={collection.id} className={`cursor-pointer py-1 text-sm transition-colors ${draft.collections.has(collection.slug) ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-secondary text-secondary-foreground hover:bg-muted"}`} onClick={() => toggleSet("collections", collection.slug)}>

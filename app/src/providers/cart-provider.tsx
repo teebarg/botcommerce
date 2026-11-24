@@ -7,9 +7,9 @@ interface CartContextType {
     cartCount: number;
     isLoading: boolean;
     error?: any;
-    addToCart: (variantId: number, quantity?: number) => void;
-    removeFromCart: (id: number) => void;
-    updateQuantity: (id: number, quantity: number) => void;
+    addToCart: (variantId: number, quantity?: number, options?: { openCart?: boolean; optimisticItem?: CartItem }) => Promise<CartItem>;
+    removeFromCart: (id: number, options?: { notify?: boolean }) => Promise<void>;
+    updateQuantity: (id: number, quantity: number, options?: { openCart?: boolean; notify?: boolean }) => Promise<CartItem>;
     wishlist: number[];
     toggleWishlist: (id: number) => void;
     isWishlisted: (id: number) => boolean;
@@ -29,9 +29,9 @@ export const useCart = () => {
                 isLoading: true,
                 error: null,
                 cartCount: 0,
-                addToCart: () => { },
-                removeFromCart: () => { },
-                updateQuantity: () => { },
+                addToCart: async () => undefined as unknown as CartItem,
+                removeFromCart: async () => { },
+                updateQuantity: async () => undefined as unknown as CartItem,
                 wishlist: [],
                 toggleWishlist: () => { },
                 isWishlisted: () => false,
@@ -54,24 +54,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const [cartOpen, setCartOpen] = useState<boolean>(false);
 
     const addToCart = useCallback(
-        async (variantId: number, quantity = 1) => {
-            await addItem({ variant_id: variantId, quantity });
-            setCartOpen(true);
+        async (variantId: number, quantity = 1, options: { openCart?: boolean; optimisticItem?: CartItem } = {}) => {
+            const updatedCart = await addItem({ variant_id: variantId, quantity, optimisticItem: options.optimisticItem });
+            if (options.openCart !== false) setCartOpen(true);
+            return updatedCart;
         },
         [addItem]
     );
 
     const updateQuantity = useCallback(
-        async (id: number, quantity = 1) => {
-            await changeQuantity({ item_id: id, quantity });
-            setCartOpen(true);
+        async (id: number, quantity = 1, options: { openCart?: boolean; notify?: boolean } = {}) => {
+            const updatedCart = await changeQuantity({ item_id: id, quantity, notify: options.notify });
+            if (options.openCart !== false) setCartOpen(true);
+            return updatedCart;
         },
         [changeQuantity]
     );
 
     const removeFromCart = useCallback(
-        async (id: number) => {
-            await deleteItem(id);
+        async (id: number, options: { notify?: boolean } = {}) => {
+            await deleteItem({ item_id: id, notify: options.notify });
         },
         [deleteItem]
     );

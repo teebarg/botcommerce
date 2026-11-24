@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { Image } from "@/components/ui/image";
+import { cn } from "@/utils/cn";
 
 interface LazyImageProps {
     src: string;
@@ -26,7 +27,7 @@ export default function LazyImage({
     }, []);
 
     return (
-        <div className={`relative overflow-hidden bg-secondary ${className}`} style={{ aspectRatio: aspect }}>
+        <div className={cn("relative overflow-hidden", className)} style={{ aspectRatio: aspect }}>
             {!loaded && <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-background to-secondary" />}
             <Image
                 ref={attach}

@@ -19,19 +19,18 @@ export default function AlbumPage({ data }: AlbumPageProps) {
     const { view, setView } = useFeedUi({
         defaultView: "list",
     });
-    const { items, ids, variantIds, toggle, remove, clear } = useQuickOrderSelection();
+    const { items, variantIds, toggle, remove, updateQuantity, clear, isSyncing } = useQuickOrderSelection();
     const [choosingProduct, setChoosingProduct] = useState<ProductSearch | null>(null);
 
     const products: ProductSearch[] = data.products;
 
     const selectedItems = useMemo(() => {
-        const liveById = new Map(products.map((p) => [p.id, p]));
+        const liveById = new Map(products.map((p) => [p.slug, p]));
         return items.flatMap((item) => {
-            const live = liveById.get(item.id);
+            const live = liveById.get(item.slug);
             if (!live) return [item];
-            // Refresh price and label from the exact variant, and drop it if it sold out.
-            const variant = live.variants?.find((v) => v.id === item.variantId);
-            return variant && variant.inventory > 0 ? [toSelectedItem(live, variant)] : [];
+            // Keep cart price/quantity/variant authoritative; enrich only the product image/id.
+            return [{ ...item, id: live.id, image: live.image || item.image }];
         });
     }, [items, products]);
 
@@ -96,8 +95,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                                 key={product.id}
                                 product={product}
                                 priority={index < 4}
-                                selectable={true}
-                                selected={ids.has(product.id)}
+                                                                selected={product.variants?.some((variant) => variantIds.has(variant.id)) ?? false}
                                 onSelect={() => toggle(toSelectedItem(product))}
                                 onChoose={() => setChoosingProduct(product)}
                             />
@@ -109,7 +107,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                             <ProductGridItem
                                 key={p.id}
                                 product={p}
-                                isSelected={ids.has(p.id)}
+                                isSelected={p.variants?.some((variant) => variantIds.has(variant.id)) ?? false}
                                 onToggle={() => toggle(toSelectedItem(p))}
                                 onOpen={() => handleOpenFromGrid(p.id)}
                             />
@@ -118,15 +116,15 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                 )}
             </main>
 
-            <QuickOrderBar items={selectedItems} onRemove={remove} onClear={clear} onSent={clear} />
+            <QuickOrderBar items={selectedItems} onRemove={remove} onQuantityChange={updateQuantity} onClear={clear} isSyncing={isSyncing} />
             <OptionsSheet
                 product={choosingProduct}
                 open={!!choosingProduct}
                 onOpenChange={(next) => !next && setChoosingProduct(null)}
-                confirmLabel="Add to selection"
+                confirmLabel="Add to cart"
                 showWhatsApp={false}
                 selectedIds={variantIds}
-                onConfirm={(variant) => choosingProduct && toggle(toSelectedItem(choosingProduct, variant))}
+                onConfirm={(variant) => { if (choosingProduct) void toggle(toSelectedItem(choosingProduct, variant)); }}
             />
         </div>
     );

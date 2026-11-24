@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Cart, CartUpdate, Message, Order } from "@/schemas";
+import type { Cart, CartItem, CartUpdate, Message, Order } from "@/schemas";
 import { api } from "@/utils/api";
 
 export const useMyCart = () => {
@@ -16,9 +16,10 @@ export const useAddToCart = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) =>
-            await api.post<Cart>("/cart/items", { variant_id, quantity }),
-        onMutate: async ({ variant_id, quantity }) => {
+        mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number; optimisticItem?: CartItem }) =>
+            await api.post<CartItem>("/cart/items", { variant_id, quantity }),
+        onMutate: async (variables: { variant_id: number; quantity: number; optimisticItem?: CartItem }) => {
+            const { variant_id, quantity } = variables;
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
             const previousCart = queryClient.getQueryData<Cart>(["cart"]);
@@ -41,6 +42,8 @@ export const useAddToCart = () => {
                             ...old,
                             items: updatedItems,
                         };
+                    } else if (variables.optimisticItem) {
+                        return { ...old, items: [...old.items, variables.optimisticItem] };
                     } else {
                         return old;
                     }
@@ -49,8 +52,18 @@ export const useAddToCart = () => {
 
             return { previousCart };
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+        onSuccess: async (addedItem) => {
+            queryClient.setQueryData<Cart>(["cart"], (old) => {
+                if (!old) return old;
+                const existingIndex = old.items.findIndex((item) => item.variant_id === addedItem.variant_id);
+                if (existingIndex >= 0) {
+                    const items = [...old.items];
+                    items[existingIndex] = addedItem;
+                    return { ...old, items };
+                }
+                return { ...old, items: [...old.items, addedItem] };
+            });
+            await queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any, variables, context) => {
             if (context?.previousCart) {
@@ -65,8 +78,8 @@ export const useChangeCartQuantity = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) =>
-            await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`, {}),
+        mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number; notify?: boolean }) =>
+            await api.put<CartItem>(`/cart/items/${item_id}?quantity=${quantity}`, {}),
         onMutate: async ({ item_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -87,9 +100,9 @@ export const useChangeCartQuantity = () => {
 
             return { previousCart };
         },
-        onSuccess: () => {
-            toast.success("Cart updated");
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+        onSuccess: async (_data, variables) => {
+            if (variables.notify !== false) toast.success("Cart updated");
+            await queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any, variables, context) => {
             if (context?.previousCart) {
@@ -117,12 +130,21 @@ export const useUpdateCartDetails = () => {
 export const useDeleteCartItem = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (item_id: number) => await api.delete<Message>(`/cart/items/${item_id}`),
-        onSuccess: () => {
-            toast.success("Item removed from cart");
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+        mutationFn: async ({ item_id }: { item_id: number; notify?: boolean }) => await api.delete<Message>(`/cart/items/${item_id}`),
+        onMutate: async ({ item_id }) => {
+            await queryClient.cancelQueries({ queryKey: ["cart"] });
+            const previousCart = queryClient.getQueryData<Cart>(["cart"]);
+            if (previousCart) {
+                queryClient.setQueryData<Cart>(["cart"], (old) => old ? { ...old, items: old.items.filter((item) => item.id !== item_id) } : old);
+            }
+            return { previousCart };
         },
-        onError: (error: any) => {
+        onSuccess: async (_data, variables) => {
+            if (variables.notify !== false) toast.success("Item removed from cart");
+            await queryClient.invalidateQueries({ queryKey: ["cart"] });
+        },
+        onError: (error: any, _variables, context) => {
+            if (context?.previousCart) queryClient.setQueryData<Cart>(["cart"], context.previousCart);
             toast.error(error.message || "Failed to remove item");
         },
     });
