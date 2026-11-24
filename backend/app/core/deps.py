@@ -1,24 +1,20 @@
+import asyncio
 import time
 from typing import Annotated, Literal, Optional
 
 import httpx
 import jwt
-from fastapi import Cookie, Depends, HTTPException, status
-from fastapi.security import (
-    APIKeyHeader,
-    HTTPAuthorizationCredentials,
-    HTTPBearer,
-    OAuth2PasswordBearer,
-)
-from jose import jwt as jose_jwt
-from pydantic import BaseModel
-
 from app.core import security
 from app.core.config import settings
 from app.core.dependencies.cache import CacheDep
 from app.core.logging import get_logger
 from app.models.user import UserInternal as User
 from app.prisma_client import prisma
+from fastapi import Cookie, Depends, HTTPException, status
+from fastapi.security import (APIKeyHeader, HTTPAuthorizationCredentials,
+                              HTTPBearer, OAuth2PasswordBearer)
+from jose import jwt as jose_jwt
+from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
@@ -45,19 +41,32 @@ CLERK_JWKS_URL: str = settings.CLERK_JWKS_URL
 
 JWKS_CACHE = None
 JWKS_CACHE_EXP = 0
+_JWKS_LOCK = asyncio.Lock()
 
 
 async def get_jwks():
+    """Clerk JWKS, refreshed hourly. One refresh at a time, with a timeout, and the
+    stale copy is kept if Clerk is briefly unreachable."""
     global JWKS_CACHE, JWKS_CACHE_EXP
 
-    # refresh every hour
     if JWKS_CACHE and time.time() < JWKS_CACHE_EXP:
         return JWKS_CACHE
 
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(CLERK_JWKS_URL)
-        JWKS_CACHE = resp.json()
-        JWKS_CACHE_EXP = time.time() + 3600
+    async with _JWKS_LOCK:
+        if JWKS_CACHE and time.time() < JWKS_CACHE_EXP:
+            return JWKS_CACHE
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                resp = await client.get(CLERK_JWKS_URL)
+                resp.raise_for_status()
+                JWKS_CACHE = resp.json()
+                JWKS_CACHE_EXP = time.time() + 3600
+        except Exception as e:
+            logger.error(f"[JWKS] refresh failed: {e}")
+            if JWKS_CACHE:
+                JWKS_CACHE_EXP = time.time() + 60  # keep serving the stale keys, retry soon
+                return JWKS_CACHE
+            raise HTTPException(503, "Authentication service unavailable")
 
     return JWKS_CACHE
 
@@ -97,7 +106,7 @@ async def get_internal_service(
 
         return ServicePrincipal(
             name=payload.get("sub"),
-            role=payload.get("role", "ADMIN"),
+            role=payload.get("role", "SERVICE"),
         )
 
     except Exception as e:

@@ -57,6 +57,7 @@ const OrderTable = ({ order }: OrderCardProps) => {
 const OrderCard = ({ order }: OrderCardProps) => {
     const initials = getInitials(order.user?.first_name, order.user?.last_name);
     const fullName = `${order.user?.first_name ?? ""} ${order.user?.last_name ?? ""}`.trim();
+    const totalItems = order.order_items.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -75,7 +76,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
             <div className="grid grid-cols-3 gap-3 px-4 py-3 border-b border-border">
                 <div>
                     <p className="text-2xs font-medium uppercase tracking-widest text-muted-foreground">Items</p>
-                    <p className="text-sm text-foreground">{order.order_items.length} {order.order_items.length === 1 ? "item" : "items"}</p>
+                    <p className="text-sm text-foreground">{totalItems} {totalItems === 1 ? "item" : "items"}</p>
                 </div>
                 <div>
                     <p className="text-2xs font-medium uppercase tracking-widest text-muted-foreground">Total</p>

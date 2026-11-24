@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from prisma.enums import PaymentMethod, ShippingMethod
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.lib.validation import PhoneNumber
 
@@ -20,7 +20,9 @@ class ProductVariantModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    product_id: int | None = None
     sku: str
+    status: str | None = None
     price: float
     old_price: Optional[float] = 0.0
     inventory: int
@@ -29,6 +31,7 @@ class ProductVariantModel(BaseModel):
     color: Optional[str] = None
     width: Optional[int] = None
     length: Optional[int] = None
+    attributes: dict[str, str] = Field(default_factory=dict)
 
 class CartAddress(BaseModel):
     model_config = ConfigDict(from_attributes=True)

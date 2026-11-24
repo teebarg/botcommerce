@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useWebSocket } from "pulsews";
+import { useWebSocket } from "@/providers/realtime-provider";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation, useChatStatusMutation } from "@/hooks/useApi";
 import { ChatMessage, ChatResponse, ConversationStatus, MessageSender } from "@/schemas";

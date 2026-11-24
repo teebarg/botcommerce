@@ -29,7 +29,7 @@ export function UserDropdown() {
 
             {isOpen && (
                 <Suspense fallback={null}>
-                    <UserDropdownContent closeMenu={() => setIsOpen(false)} />
+                    <UserDropdownContent />
                 </Suspense>
             )}
         </DropdownMenu>

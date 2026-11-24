@@ -39,11 +39,11 @@ export interface CampaignProduct {
 
 export interface Campaign {
     title: string;
-    products: CampaignProduct[];
+    products: ProductSearch[];
 }
 
 export const getCampaignFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
     .handler(async ({ data }) => {
-        return await api.get<Campaign>(`/product/campaigns/${data}`);
+        return await api.get<Campaign>(`/album/${data}`);
     });

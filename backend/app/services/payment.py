@@ -15,6 +15,16 @@ logger = get_logger(__name__)
 
 PAYSTACK_BASE_URL = "https://api.paystack.co"
 
+_http_client: httpx.AsyncClient | None = None
+
+
+def _get_http_client() -> httpx.AsyncClient:
+    """One shared client (connection reuse, TLS handshake once) with sane timeouts."""
+    global _http_client
+    if _http_client is None or _http_client.is_closed:
+        _http_client = httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0))
+    return _http_client
+
 
 class PaymentService:
     def __init__(self, db: Prisma, queue: ArqRedis, cache_srv: CacheService, product_srv: ProductService):
@@ -30,12 +40,12 @@ class PaymentService:
 
         reference = f"{order.payment_method}-{order.order_number}"
 
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
+        try:
+            response = await _get_http_client().post(
                 f"{PAYSTACK_BASE_URL}/transaction/initialize",
                 json={
                     "email": order.email,
-                    "amount": int(order.total * 100),
+                    "amount": round(order.total * 100),
                     "reference": reference,
                     "callback_url": (f"{settings.FRONTEND_HOST}/payment/verify"),
                     "metadata": {
@@ -47,6 +57,9 @@ class PaymentService:
                     "Content-Type": "application/json",
                 },
             )
+        except httpx.HTTPError as e:
+            logger.error(f"Paystack initialize failed: {e}")
+            raise HTTPException(status_code=502, detail="Payment provider unreachable")
 
         if response.status_code != 200:
             raise HTTPException(
@@ -66,13 +79,16 @@ class PaymentService:
         self,
         reference: str,
     ):
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        try:
+            response = await _get_http_client().get(
                 f"{PAYSTACK_BASE_URL}/transaction/verify/{reference}",
                 headers={
                     "Authorization": (f"Bearer {settings.PAYSTACK_SECRET_KEY}"),
                 },
             )
+        except httpx.HTTPError as e:
+            logger.error(f"Paystack verify failed: {e}")
+            raise HTTPException(status_code=502, detail="Payment provider unreachable")
 
         if response.status_code != 200:
             raise HTTPException(
@@ -88,9 +104,15 @@ class PaymentService:
                 detail="Payment verification failed",
             )
 
-        return await self.record_success(reference=data["reference"])
+        return await self.record_success(reference=data["reference"], paid_kobo=data.get("amount"))
 
-    async def record_success(self, reference: str):
+    async def record_success(self, reference: str, paid_kobo: int | None = None):
+        """Mark a payment successful. Safe to call repeatedly and concurrently (the webhook and
+        the browser's verify call usually race): only the call that wins the atomic claim below
+        decrements stock and queues jobs.
+
+        `paid_kobo` is the amount Paystack reports; if given it must cover the order total.
+        """
         payment = await self.db.payment.find_first(
             where={"reference": reference},
             include={"order": True},
@@ -105,13 +127,22 @@ class PaymentService:
         if payment.status == "SUCCESS":
             return payment.order
 
-        async with self.db.tx() as tx:
-            await tx.payment.update(
-                where={"id": payment.id},
-                data={
-                    "status": "SUCCESS",
-                },
+        if paid_kobo is not None and paid_kobo < round(float(payment.amount) * 100):
+            logger.error(
+                f"Underpayment for {reference}: paid {paid_kobo} kobo, expected {round(float(payment.amount) * 100)}"
             )
+            raise HTTPException(status_code=400, detail="Amount paid does not match the order total")
+
+        oversold: list[str] = []
+        product_ids: set[int] = set()
+
+        async with self.db.tx() as tx:
+            claimed = await tx.payment.update_many(
+                where={"id": payment.id, "status": {"not": "SUCCESS"}},
+                data={"status": "SUCCESS"},
+            )
+            if claimed == 0:
+                return payment.order  # someone else already processed it
 
             order = await tx.order.update(
                 where={"id": payment.order_id},
@@ -119,43 +150,70 @@ class PaymentService:
                     "payment_status": PaymentStatus.SUCCESS,
                     "status": OrderStatus.PROCESSING,
                 },
+                include={"order_items": {"include": {"variant": True}}},
             )
 
             await tx.ordertimeline.create(
                 data={
                     "order": {"connect": {"id": payment.order_id}},
-                    "from_status": order.status,
+                    "from_status": payment.order.status,
                     "to_status": OrderStatus.PROCESSING,
                     "message": "Payment confirmed.",
                 }
             )
 
-        await self.cache_srv.invalidate(f"order:{payment.order_id}", f"order-timeline:{payment.order_id}", tags=["orders"])
-        await self._finalize_paid_order(order_id=payment.order_id)
+            # Stock moves in the same transaction as the payment, and never below zero.
+            for item in order.order_items:
+                if item.variant_id is None:
+                    continue
+                if item.variant:
+                    product_ids.add(item.variant.product_id)
+
+                decremented = await tx.productvariant.update_many(
+                    where={"id": item.variant_id, "inventory": {"gte": item.quantity}},
+                    data={"inventory": {"decrement": item.quantity}},
+                )
+                if decremented == 0:
+                    # Paid, but stock ran out in the meantime. Don't fail the payment: take what is
+                    # left, and flag the order so someone can contact the customer.
+                    oversold.append(f"{item.name} x{item.quantity}")
+                    await tx.productvariant.update_many(
+                        where={"id": item.variant_id}, data={"inventory": 0}
+                    )
+                await tx.productvariant.update_many(
+                    where={"id": item.variant_id, "inventory": {"lte": 0}},
+                    data={"status": "OUT_OF_STOCK"},
+                )
+
+            if oversold:
+                await tx.ordertimeline.create(
+                    data={
+                        "order": {"connect": {"id": payment.order_id}},
+                        "from_status": OrderStatus.PROCESSING,
+                        "to_status": OrderStatus.PROCESSING,
+                        "message": f"ATTENTION: stock ran out before this paid order was confirmed: {', '.join(oversold)}",
+                    }
+                )
+
+        if oversold:
+            logger.error(f"Oversold on paid order {payment.order_id}: {oversold}")
+
+        # After commit: caches, search index, background jobs. None of these may fail the payment.
+        await self._after_payment_committed(order_id=payment.order_id, product_ids=list(product_ids))
         return order
 
-    async def _finalize_paid_order(self, order_id: int):
-        """
-        Single source of truth for marking an order paid — records the Payment 1-1 relation check
-        """
-        order = await self.db.order.find_unique(
-            where={"id": order_id},
-            include={
-                "order_items": {"include": {"variant": True}},
-            },
-        )
-        if not order:
-            logger.error(f"Order not found for ID: {order_id}")
-            raise Exception("Order not found")
-
-        product_ids = []
-        for item in order.order_items:
-            await self.db.productvariant.update(
-                where={"id": item.variant_id},
-                data={"inventory": {"decrement": item.quantity}},
+    async def _after_payment_committed(self, order_id: int, product_ids: list[int]) -> None:
+        try:
+            await self.cache_srv.invalidate(
+                f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders"]
             )
-            product_ids.append(item.variant.product_id)
+            if product_ids:
+                await self.product_srv.index_products(product_ids=product_ids)
+        except Exception as e:
+            logger.error(f"Post-payment cache/index refresh failed for order {order_id}: {e}")
 
-        await self.product_srv.index_products(product_ids=product_ids)
-        await self.queue.enqueue_job("process_referral", order_id=order_id)
-        await self.queue.enqueue_job("generate_and_send_invoice", order_id=order_id)
+        for job in ("process_referral", "generate_and_send_invoice"):
+            try:
+                await self.queue.enqueue_job(job, order_id=order_id)
+            except Exception as e:
+                logger.critical(f"Order {order_id} paid but job '{job}' was not queued: {e}")

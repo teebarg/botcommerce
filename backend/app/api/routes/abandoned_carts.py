@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -11,7 +12,7 @@ from app.schemas.cart import CartListResponse, CartResponse
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", dependencies=[Depends(require_admin)])
 async def list_abandoned_carts(
     srv: CartDep,
     skip: int = Query(0, ge=0),
@@ -22,7 +23,7 @@ async def list_abandoned_carts(
         skip=skip, limit=limit, search=search
     )
     return CartListResponse(
-        items=[await srv._with_computed_totals(c) for c in items],
+        items=list(await asyncio.gather(*(srv._with_computed_totals(c, light=True) for c in items))),
         total=total,
         skip=skip,
         limit=limit,
@@ -30,9 +31,9 @@ async def list_abandoned_carts(
     )
 
 
-@router.get("/{id}", response_model=CartResponse)
+@router.get("/{id}", response_model=CartResponse, dependencies=[Depends(require_admin)])
 async def get_abandoned_cart(id: int, srv: CartDep):
-    cart = await srv.get_by_id(id)
+    cart = await srv.get_by_id(id, detailed=True)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     return await srv._with_computed_totals(cart)

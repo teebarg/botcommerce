@@ -1,15 +1,10 @@
 import { currency } from "@/utils";
 import type { OrderItem } from "@/schemas";
 import ImageLightbox from "@/components/image-lightbox";
+import { variantAttributes } from "@/lib/variant";
 
 export default function OrderItemComponent({ item }: { item: OrderItem }) {
-    const variantText = [
-        item.variant?.size && `S: ${item.variant.size}`,
-        item.variant?.color && `Color: ${item.variant.color}`,
-        item.variant?.width && `W: ${item.variant.width}`,
-        item.variant?.length && `L: ${item.variant.length}`,
-        item.variant?.age && `Age: ${item.variant.age}`,
-    ].filter(Boolean).join(" · ");
+    const variantText = item.variant ? Object.entries(variantAttributes(item.variant)).map(([name, value]) => `${name}: ${value}`).join(" · ") : "";
 
     return (
         <div className="flex items-center gap-3 px-4 py-3">
@@ -20,7 +15,7 @@ export default function OrderItemComponent({ item }: { item: OrderItem }) {
                 />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{item.name}</p>
+                <p className="text-sm font-medium truncate max-w-60">{item.name}</p>
                 {variantText && <p className="text-xs text-muted-foreground mt-0.5">{variantText}</p>}
                 <p className="text-xs text-muted-foreground mt-1">
                     {item.quantity} × {currency(Number(item.price) || 0)}

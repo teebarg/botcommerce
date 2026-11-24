@@ -7,11 +7,7 @@ import { Message } from "@/schemas";
 import { api } from "@/utils/api";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface UserDropdownContentProps {
-    closeMenu?: () => void;
-}
-
-export default function UserDropdownContent({ closeMenu }: UserDropdownContentProps) {
+export default function UserDropdownContent() {
     const { isImpersonating, isAdmin, user } = useRouteContext({ strict: false });
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -25,6 +21,7 @@ export default function UserDropdownContent({ closeMenu }: UserDropdownContentPr
         }
         await logoutFn();
         sessionStorage.clear();
+        navigator.serviceWorker?.controller?.postMessage({ type: "CLEAR_USER_CACHES" });
         queryClient.setQueryData(["session"], null);
         queryClient.invalidateQueries({ queryKey: ["session"] });
         router.invalidate();

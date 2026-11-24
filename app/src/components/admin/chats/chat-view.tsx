@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import AdminChatMessage from "./chat-message";
 import { useAdminMessageMutation, useChatHandOff, useChatStatusMutation } from "@/hooks/useApi";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useWebSocket } from "pulsews";
+import { useWebSocket } from "@/providers/realtime-provider";
 import { chatAvatar, ChatInput } from "@/utils/reuseable";
 import { Button } from "@/components/ui/button";
 import { useOverlayTriggerState } from "react-stately";

@@ -12,7 +12,7 @@ export default function CategoriesWithProductsSection() {
             {data?.map((category: CategoriesWithProducts) => {
                 if (category.products.length === 0) return null;
                 return (
-                    <div key={category.id} className="space-y-4">
+                    <div key={category.id} className="space-y-2">
                         <div className="flex items-center justify-between">
                             <h3 className="font-display text-lg font-medium">{category.name}</h3>
                             <Link
@@ -25,7 +25,7 @@ export default function CategoriesWithProductsSection() {
                             </Link>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1">
                             {category.products.map((product: ProductSearch) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}

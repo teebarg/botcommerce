@@ -4,26 +4,40 @@ import time
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
 from app.core.logging import logger
+from app.services.cache import CacheService
 from app.services.websocket import manager
 
 router = APIRouter()
 
+MAX_SESSION_ID_LEN = 64
+MAX_PATH_LEN = 200
+
+
+async def _authenticated_session(ws: WebSocket) -> dict | None:
+    """The logged-in session behind this socket, from the session cookie.
+    """
+    session_id = ws.cookies.get("session_id")
+    if not session_id:
+        return None
+    try:
+        return await CacheService(ws.app.state.redis).get_session(session_id)
+    except Exception as e:
+        logger.error(f"WebSocket session lookup failed: {e}")
+        return None
+
+
 @router.websocket("/")
 async def websocket(ws: WebSocket) -> None:
-    """
-    Handles the WebSocket endpoint with RedisConnectionManager.
+    """Realtime channel: cache-invalidation pushes for everyone, online-users for admins."""
+    app_session_id: str | None = ws.query_params.get("session_id")
+    if not app_session_id or len(app_session_id) > MAX_SESSION_ID_LEN:
+        await ws.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
 
-    Args:
-        ws (WebSocket): The WebSocket connection.
-
-    Returns:
-        None
-    """
-    app_session_id: str = ws.query_params.get("session_id")
-    user_id = None
+    user_id: str | None = None
 
     if not await manager.connect(app_session_id, ws, metadata={
-        "ip": ws.client.host,
+        "ip": ws.client.host if ws.client else "unknown",
         "type": "guest",
         "location": "Unknown",
         "path": "/",
@@ -38,7 +52,7 @@ async def websocket(ws: WebSocket) -> None:
         await ws.close(code=status.WS_1011_INTERNAL_ERROR)
         return
 
-    await manager.broadcast_sessions()
+    manager.schedule_sessions_broadcast()
 
     try:
         while True:
@@ -48,36 +62,40 @@ async def websocket(ws: WebSocket) -> None:
                 message_type = payload.get("type")
 
                 if message_type == "init":
-                    user_id = payload.get("id")
-                    email = payload.get("email")
+                    session = await _authenticated_session(ws)
+                    if not session or not session.get("id"):
+                        continue
 
-                    if user_id:
-                        if await manager.promote_connection(old_id=app_session_id, new_id=user_id, metadata={
-                            "type": "user",
-                            "email": email or "Unknown",
-                            "location": "Unknown",
-                            "path": "/",
-                            "updated_at": str(int(time.time()))
-                        }):
-                            session_id = await redis.get(f"chat_session:{app_session_id}")
-                            if session_id:
-                                await redis.set(f"chat_user:{session_id}", user_id)
-                                await redis.delete(f"chat_session:{app_session_id}")
-                                logger.debug(f"Updated chat mapping {session_id} → {user_id}")
-                        else:
-                            await manager.register(user_id=user_id, websocket=ws)
-                            logger.debug(f"Promotion failed, registered {user_id} directly")
-                        await manager.broadcast_sessions()
+                    user_id = str(session["id"])
+                    metadata = {
+                        "type": "user",
+                        "email": session.get("email") or "Unknown",
+                        "is_admin": "admin" in (session.get("roles") or []),
+                        "location": "Unknown",
+                        "path": "/",
+                        "updated_at": str(int(time.time()))
+                    }
+                    if await manager.promote_connection(old_id=app_session_id, new_id=user_id, metadata=metadata):
+                        chat_session_id = await redis.get(f"chat_session:{app_session_id}")
+                        if chat_session_id:
+                            await redis.set(f"chat_user:{chat_session_id}", user_id)
+                            await redis.delete(f"chat_session:{app_session_id}")
+                            logger.debug(f"Updated chat mapping {chat_session_id} → {user_id}")
+                    else:
+                        await manager.register(user_id=user_id, websocket=ws)
+                        logger.debug(f"Promotion failed, registered {user_id} directly")
+                    manager.schedule_sessions_broadcast()
                     continue
 
                 elif message_type == "ping":
                     await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="updated_at", value=str(int(time.time())))
 
                 elif message_type == "path":
-                    await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="path", value=payload.get("path", "/"))
+                    path = str(payload.get("path", "/"))[:MAX_PATH_LEN]
+                    await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="path", value=path)
 
             except json.JSONDecodeError:
-                logger.error(f"Invalid JSON received: {msg}")
+                logger.error("Invalid JSON received on websocket")
                 continue
             except Exception as e:
                 logger.error(f"An error occurred processing message: {e}")
@@ -89,4 +107,4 @@ async def websocket(ws: WebSocket) -> None:
         logger.debug(f"Unexpected error in websocket handler: {e}")
     finally:
         await manager.disconnect(user_id or app_session_id)
-        await manager.broadcast_sessions()
+        manager.schedule_sessions_broadcast()

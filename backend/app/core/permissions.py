@@ -1,6 +1,5 @@
-from fastapi import Depends, HTTPException
-
 from app.core.deps import verify_session
+from fastapi import Depends, HTTPException
 
 
 async def require_user(session=Depends(verify_session)):
@@ -8,7 +7,7 @@ async def require_user(session=Depends(verify_session)):
 
 
 async def require_admin(session=Depends(verify_session)):
-    roles = session.get("roles")
+    roles = session.get("roles") or []
     if not any(role in ["admin"] for role in roles):
         raise HTTPException(
             status_code=403,
@@ -19,7 +18,7 @@ async def require_admin(session=Depends(verify_session)):
 
 
 async def require_super_admin(session=Depends(verify_session)):
-    roles = session.get("roles")
+    roles = session.get("roles") or []
 
     if "super-admin" not in roles:
         raise HTTPException(

@@ -50,9 +50,11 @@ async def create_order(
         return await srv.place_order_from_cart(
             user_id=user.id, email=user.email, cart_number=_cart_id
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Failed to create order in create_order: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to create order in create_order: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="We couldn't place your order. Please try again.")
 
 
 @router.get("/{order_id}")
@@ -60,10 +62,10 @@ async def create_order(
     key_prefix="order",
     key_builder=lambda order_id, principal: (
         f"{order_id}:admin"
-        if principal.role == "ADMIN"
+        if principal.role == "ADMIN" or principal.type == "service"
         else f"{order_id}:user:{principal.user_id}"
     ),
-    tags=lambda order_id: ["order", f"order:{order_id}"],
+    tags=lambda order_id: ["orders", f"order:{order_id}"],
 )
 async def get_order(
     request: Request,

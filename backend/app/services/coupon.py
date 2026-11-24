@@ -156,25 +156,35 @@ class CouponService:
         updated_cart = await self.db.cart.update(where={"id": cart.id}, data=data)
         return updated_cart
 
-    async def increment_coupon_usage(self, coupon_id: int, user_id: int, discount_amount: float):
+    async def increment_coupon_usage(self, coupon_id: int, user_id: int, discount_amount: float, tx=None):
         """
         Increment coupon usage count. Called when order is placed.
+
+        The max-uses check is part of the UPDATE itself, so two simultaneous checkouts can't both take the last use.
         """
-        user = await self.db.user.find_unique(
-            where={"id": user_id}
+        if tx is None:
+            async with self.db.tx() as new_tx:
+                return await self.increment_coupon_usage(coupon_id, user_id, discount_amount, tx=new_tx)
+
+        user = await tx.user.find_unique(where={"id": user_id})
+        coupon = await tx.coupon.find_unique(where={"id": coupon_id})
+        if not user or not coupon:
+            raise HTTPException(status_code=400, detail="Coupon is no longer available")
+
+        where: dict = {"id": coupon_id}
+        if coupon.max_uses is not None:
+            where["current_uses"] = {"lt": coupon.max_uses}
+        updated = await tx.coupon.update_many(where=where, data={"current_uses": {"increment": 1}})
+        if updated == 0:
+            raise HTTPException(status_code=400, detail="This coupon has reached its usage limit")
+
+        await tx.couponusage.create(
+            data={
+                "coupon_id": coupon_id,
+                "user_id": user_id,
+                "discount_amount": discount_amount,
+                "name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
+                "email": user.email,
+            }
         )
-        async with self.db.tx() as tx:
-            await tx.coupon.update(
-                where={"id": coupon_id},
-                data={"current_uses": {"increment": 1}}
-            )
-            await tx.couponusage.create(
-                data={
-                    "coupon_id": coupon_id,
-                    "user_id": user_id,
-                    "discount_amount": discount_amount,
-                    "name": user.first_name + " " + user.last_name,
-                    "email": user.email
-                }
-            )
 

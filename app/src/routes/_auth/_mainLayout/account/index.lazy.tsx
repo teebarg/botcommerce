@@ -12,6 +12,7 @@ import { cn } from "@/utils/cn";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
+    const totalItems = order.order_items.reduce((acc, item) => acc + item.quantity, 0);
 
     return (
         <Overlay
@@ -38,7 +39,7 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
                             >
                                 {order.status}
                             </span>
-                            <span className="text-xs text-muted-foreground">{order.order_items.length} items</span>
+                            <span className="text-xs text-muted-foreground">{totalItems} {totalItems === 1 ? "item" : "items"}</span>
                         </div>
                     </div>
                     <p className="font-semibold">{currency(order.total)}</p>

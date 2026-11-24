@@ -1,13 +1,14 @@
 import type React from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-import { currency } from "@/utils";
 import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
 import { AddToCartButton } from "./AddToCartButton";
-import { defaultVariant, getPriceInfo, variantLabel } from "@/lib/variant";
+import { defaultVariant, getPriceInfo, productOptions } from "@/lib/variant";
 import { WishlistButton } from "./WishlistButton";
+import { PriceLabel } from "../price-label";
+import { useProductAttributes } from "@/hooks/useProductAttributes";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -18,10 +19,11 @@ interface ProductCardProps {
 type FitMode = "cover" | "contain";
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }) => {
+    const { attributes } = useProductAttributes(product?.variants);
     const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const priceInfo = useMemo(() => getPriceInfo(product), [product]);
-    const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
+    const { hasDiscount, discountLabel } = priceInfo;
     const outOfStock = !product.in_stock;
     const showDiscountBadge = !outOfStock && hasDiscount;
 
@@ -35,6 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
     };
 
     const variant = useMemo(() => defaultVariant(product), [product]);
+    const hasChoices = productOptions(product).length > 0 && (product.variants?.length ?? 0) > 1;
 
     return (
         <Link
@@ -71,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
 
                 {showDiscountBadge && (
                     <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-2xs font-medium px-2 py-1 rounded-full">
-                        -{maxDiscountPercent}%
+                        {discountLabel}
                     </span>
                 )}
                 {product?.is_new && (
@@ -104,14 +107,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                     )}
                 >
                     <div className="sr-only">{product.name}</div>
-                    {variantLabel(variant) && (
-                        <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
-                            {variantLabel(variant)}
-                        </Badge>
+                    {!hasChoices && (
+                        <div className="flex flex-wrap gap-1">
+                            {attributes.slice(0, 3).map((attr: string, i: number) => (
+                                <span key={i} className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs">
+                                    {attr}
+                                </span>
+                            ))}
+                            {attributes.length > 3 && <span className="text-[9px] font-medium text-white/70 px-1">+{attributes.length - 3}</span>}
+                        </div>
                     )}
                     <div className="flex items-start gap-1.5">
-                        <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                        {showDiscountBadge && <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>}
+                        <PriceLabel info={priceInfo} tone="light" />
                     </div>
                 </div>
             </div>

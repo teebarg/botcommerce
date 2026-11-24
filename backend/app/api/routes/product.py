@@ -1,5 +1,4 @@
 import json
-import secrets
 import uuid
 from typing import List, Optional
 
@@ -14,7 +13,6 @@ from fastapi import (
     Response,
     UploadFile,
 )
-from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.dependencies.cache import ArqDep
@@ -35,6 +33,7 @@ from app.models.product import (
 from app.prisma_client import DbDep
 from app.services.cache import DEFAULT_EXPIRATION, cacheable
 from app.services.storage import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
+from prisma.fields import Json
 
 logger = get_logger(__name__)
 
@@ -47,7 +46,7 @@ async def get_google_merchant_feed(request: Request, srv: ProductDep, target: st
 
 
 @router.get("/{product_id}/review-status")
-@cacheable(key_prefix="review-status", key_builder=lambda product_id: product_id, cdn_ttl=600, cdn_swr=60, expire=1800)
+@cacheable(key_prefix="review-status", key_builder=lambda product_id, user: f"{product_id}:{user.id if user else 'anon'}", expire=120)
 async def get_review_status(request: Request, product_id: int, user: UserDep, srv: ProductDep) -> ReviewStatus:
     if not user:
         return ReviewStatus(has_purchased=False, has_reviewed=False)
@@ -64,7 +63,7 @@ async def recommend(request: Request, srv: ProductDep, id: int, limit: int = Que
 
 
 @router.get("/recommend")
-@cacheable(key_prefix="products:recommendation", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
+@cacheable(key_prefix="products:recommendation", key_builder=lambda user, limit: f"{user.id}:{limit}", tags=["products"], expire=1800)
 async def get_recommendations(
     request: Request, srv: ProductDep, user: CurrentUser, limit: int = Query(default=20, le=100),
 ):
@@ -80,12 +79,14 @@ async def feed(
     max_price: int = Query(default=50000, gt=0), min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""), ages: str = Query(default=""),
     width: str = Query(default=""), length: str = Query(default=""),
-    limit: int = Query(default=40, le=100), active: bool = Query(default=True),
+    attribute_filters: str = Query(default=""),
+    limit: int = Query(default=40, le=100),
     cursor: Optional[str] = Query(default=None),
 ) -> FeedProducts:
     return await srv.get_discovery_feed(
         search=search, sort=sort, cat_ids=cat_ids, collections=collections,
-        max_price=max_price, min_price=min_price, sizes=sizes, ages=ages, width=width, length=length, limit=limit, active=active, cursor=cursor
+        max_price=max_price, min_price=min_price, sizes=sizes, ages=ages, width=width, length=length,
+        attribute_filters=attribute_filters, limit=limit, active=True, cursor=cursor
     )
 
 
@@ -139,8 +140,15 @@ async def update_variant(
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
-    update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age"]
-    update_data = {f: getattr(variant, f) for f in update_fields if getattr(variant, f, None) is not None}
+    update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age", "attributes"]
+    update_data = {
+        f: getattr(variant, f)
+        for f in update_fields
+        if getattr(variant, f, None) is not None
+    }
+
+    if "attributes" in update_data:
+        update_data["attributes"] = Json(update_data["attributes"])
 
     if "inventory" in update_data:
         update_data["status"] = "IN_STOCK" if update_data["inventory"] > 0 else "OUT_OF_STOCK"
@@ -165,7 +173,7 @@ async def configure_filterable_attributes(srv: ProductDep) -> Message:
         raise HTTPException(status_code=500, detail="Configuration task error.")
 
 
-@router.get("/search/clear-index")
+@router.post("/search/clear-index", dependencies=[Depends(require_admin)])
 async def config_clear_index(srv: ProductDep):
     try:
         await srv.search_engine.clear()
@@ -284,88 +292,3 @@ async def upload_product_images(
             except Exception as cleanup_err:
                 logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
         raise HTTPException(status_code=500, detail="Failed to upload product images") from e
-
-class CampaignIn(BaseModel):
-    title: str = Field(min_length=1, max_length=80)
-    product_ids: list[int] = Field(min_length=1, max_length=100)
-
-
-def _s(v):
-    return v.decode() if isinstance(v, bytes) else v
-
-@router.post("/admin/campaigns", dependencies=[Depends(require_admin)])
-async def create_campaign(body: CampaignIn, srv: ProductDep):
-    redis = srv.cache_srv.redis
-    code = secrets.token_urlsafe(6)  # ~8 chars, unguessable
-    payload = {"title": body.title, "product_ids": body.product_ids}
-    await redis.set(f"campaign:{code}", json.dumps(payload))   # no TTL
-    await redis.sadd("campaigns:index", code)                  # so admin can list them
-    return {"code": code, "url": f"{settings.FRONTEND_HOST}/album/{code}"}
-
-@router.get("/campaigns/{code}")
-async def get_campaign(code: str, srv: ProductDep):
-    redis = srv.cache_srv.redis
-    raw = await redis.get(f"campaign:{code}")
-    if not raw:
-        raise HTTPException(404)
-    data = json.loads(raw)
-    ids = [int(i) for i in data["product_ids"]]
-    products = await srv.get_by_ids(ids)  # your existing query
-    by_id = {p.id: p for p in products}
-
-    items = []
-    for pid in ids:  # keep the admin's order
-        p = by_id.get(pid)
-        if not p:
-            continue  # deleted or inactive, skip silently
-
-        variants = p.variants or []
-        in_stock = [v for v in variants if v.status == "IN_STOCK"]
-        pool = in_stock or variants
-
-        items.append({
-            "id": p.id,
-            "name": p.name,
-            "slug": p.slug,
-            "price": min((v.price for v in pool), default=None),
-            "status": "IN_STOCK" if in_stock else (variants[0].status if variants else "OUT_OF_STOCK"),
-            "image": p.image or (p.images[0].image if p.images else None),
-        })
-
-    return {"title": data["title"], "products": items}
-
-@router.get("/admin/campaigns", dependencies=[Depends(require_admin)])
-async def list_campaigns(srv: ProductDep):
-    redis = srv.cache_srv.redis
-    codes = [_s(c) for c in await redis.smembers("campaigns:index")]
-    if not codes:
-        return {"campaigns": []}
-
-    raws = await redis.mget([f"campaign:{c}" for c in codes])
-
-    campaigns, stale = [], []
-    for code, raw in zip(codes, raws):
-        if not raw:
-            stale.append(code)  # key is gone but still in the index
-            continue
-        data = json.loads(raw)
-        campaigns.append({
-            "code": code,
-            "title": data["title"],
-            "product_count": len(data["product_ids"]),
-            "url": f"{settings.FRONTEND_HOST}/album/{code}",
-        })
-
-    if stale:
-        await redis.srem("campaigns:index", *stale)  # self-heal the index
-    return campaigns
-
-
-@router.delete("/admin/campaigns/{code}", dependencies=[Depends(require_admin)])
-async def delete_campaign(code: str, srv: ProductDep):
-    redis = srv.cache_srv.redis
-    deleted = await redis.delete(f"campaign:{code}")
-    await redis.srem("campaigns:index", code)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Campaign not found")
-    return Message(message="successful")

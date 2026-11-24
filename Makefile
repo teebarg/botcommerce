@@ -264,6 +264,12 @@ smkwds:
 	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --category we_dont_sell --limit 1
 
 
+# scripts
+.PHONY: run-script
+run-script:
+	$(DOCKER_COMPOSE) exec backend uv run python scripts/$(script).py
+
+
 # ==========================================
 # Interactive Systems Help Desk Documentation
 # ==========================================

@@ -23,6 +23,7 @@ from app.models.gallery import PaginatedGalleryImages
 from app.models.generic import ImageBulkDelete, Message
 from app.models.product import (
     ImagesBulkUpdate,
+    BulkAddProductVariants,
     ProductImageBulkUrls,
     ProductImageMetadata,
 )
@@ -199,6 +200,18 @@ async def update_image_metadata(
     product_id = await srv.update_metadata(image_id, payload)
     background_tasks.add_task(product_srv.index_product, product_id=product_id)
     return {"success": True}
+
+
+@router.post("/bulk-add-variants", dependencies=[Depends(require_admin)])
+async def bulk_add_product_variants(
+    srv: GalleryDep,
+    product_srv: ProductDep,
+    background_tasks: BackgroundTasks,
+    payload: BulkAddProductVariants,
+) -> Message:
+    result = await srv.bulk_add_product_variants(payload)
+    background_tasks.add_task(product_srv.index_products, product_ids=result["product_ids"])
+    return {"message": f"Variants applied to {result['updated_count']} products"}
 
 
 @router.patch("/bulk-update", dependencies=[Depends(require_admin)])

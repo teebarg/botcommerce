@@ -1,12 +1,7 @@
 from typing import Annotated, Any, Literal
 
-from pydantic import (
-    AnyUrl,
-    BeforeValidator,
-    EmailStr,
-    HttpUrl,
-    computed_field,
-)
+from pydantic import (AnyUrl, BeforeValidator, EmailStr, HttpUrl,
+                      computed_field, model_validator)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,7 +27,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = ""
 
-    PAYSTACK_SECRET_KEY: str = "Pk_test_5029925955255255"
+    PAYSTACK_SECRET_KEY: str = ""
 
     DOMAIN: str = "localhost"
     FRONTEND_HOST: str = "http://localhost:3000"
@@ -54,8 +49,15 @@ class Settings(BaseSettings):
     VAPID_PRIVATE_KEY: str = ""
 
     REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_MAX_CONNECTIONS: int = 50
     BROKER_URL: str = "redis://localhost:6379/0"
     SENTRY_DSN: HttpUrl | None = None
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
+
+    # Comma-separated IPs/CIDRs of the reverse proxy / load balancer allowed to set
+    # X-Forwarded-For. "*" trusts every caller (clients can then spoof their IP and
+    # bypass IP-based rate limits).
+    TRUSTED_PROXY_IPS: str = "*"
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
@@ -119,6 +121,26 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
         extra="ignore",
     )
+
+
+    @model_validator(mode="after")
+    def _refuse_default_secrets(self) -> "Settings":
+        """Fail fast instead of running staging/production on guessable defaults."""
+        if self.ENVIRONMENT == "local":
+            return self
+        insecure_values: dict[str, set[str]] = {
+            "SECRET_KEY": {"", "specialsecret"},
+            "PAYSTACK_SECRET_KEY": {""},
+            "EXTENSION_SECRET_KEY": {"", "secret"},
+            "MEILI_MASTER_KEY": {"", "masterKey"},
+            "INTERNAL_WORKER_SECRET": {""},
+        }
+        bad = [name for name, bad_values in insecure_values.items() if getattr(self, name) in bad_values]
+        if bad:
+            raise ValueError(
+                f"Refusing to start in '{self.ENVIRONMENT}' with default/empty secrets: {', '.join(bad)}"
+            )
+        return self
 
 
 settings = Settings()

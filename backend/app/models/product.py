@@ -14,9 +14,16 @@ class ProductImage(BaseModel):
     class Config:
         from_attributes = True
 
+class ProductOption(BaseModel):
+    name: str = Field(..., min_length=1, max_length=80)
+    values: List[str] = Field(..., min_length=1)
+
+
 class ProductVariant(BaseModel):
     id: int
+    product_id: Optional[int] = None
     sku: Optional[str] = None
+    status: Optional[str] = None
     price: float
     old_price: Optional[float] = 0.0
     inventory: int = 0
@@ -25,6 +32,7 @@ class ProductVariant(BaseModel):
     color: Optional[str] = None
     width: Optional[int] = None
     length: Optional[int] = None
+    attributes: dict[str, str] = Field(default_factory=dict)
 
     class Config:
         from_attributes = True
@@ -39,6 +47,7 @@ class VariantWithStatus(BaseModel):
     width: Optional[int] = None
     length: Optional[int] = None
     age: Optional[str] = None
+    attributes: Optional[dict[str, str]] = None
 
 class ProductCreate(BaseModel):
     name: Optional[str] = Field(None)
@@ -64,6 +73,7 @@ class Product(BaseModel):
     description: Optional[str] = None
     images: Optional[List[ProductImage]] = []
     variants: Optional[List[ProductVariant]] = None
+    options: List[ProductOption] = Field(default_factory=list)
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     active: Optional[bool] = True
@@ -89,11 +99,22 @@ class ProductSearch(BaseModel):
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 
+class AvailableFilterValue(BaseModel):
+    value: str
+    count: int
+
+
+class AvailableFilter(BaseModel):
+    name: str
+    values: List[AvailableFilterValue]
+
+
 class FeedProducts(BaseModel):
     products: List[ProductSearch]
     total_count: int
     limit: int
     next_cursor: str | None
+    available_filters: List[AvailableFilter] = Field(default_factory=list)
 
 class IndexProducts(BaseModel):
     featured: List[ProductSearch]
@@ -101,6 +122,7 @@ class IndexProducts(BaseModel):
     trending: List[ProductSearch]
 
 class ProductImageMetadata(ProductCreate):
+    options: Optional[List[ProductOption]] = None
     variants: Optional[List[VariantWithStatus]] = None
 
 class ImageMetadata(BaseModel):
@@ -121,6 +143,19 @@ class ImageMetadata(BaseModel):
 class ImagesBulkUpdate(BaseModel):
     image_ids: List[int]
     data: ImageMetadata
+
+
+class BulkVariantValue(BaseModel):
+    attributes: dict[str, str]
+    price: float = Field(..., gt=0)
+    old_price: Optional[float] = 0.0
+    inventory: int = Field(..., ge=0)
+
+
+class BulkAddProductVariants(BaseModel):
+    product_ids: List[int] = Field(..., min_length=1)
+    options: List[ProductOption] = Field(..., min_length=1)
+    variants: List[BulkVariantValue] = Field(..., min_length=1)
 
 class ProductImageBulkUrls(BaseModel):
     urls: list[str]

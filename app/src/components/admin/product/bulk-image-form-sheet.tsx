@@ -4,27 +4,19 @@ import { Tag, Settings } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
 import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { useBulkProductUpdate } from "@/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
-import { COLOR_OPTIONS, ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 import { Separator } from "@/components/ui/separator";
-import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 type FormProduct = {
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
     active: boolean;
     is_new: boolean;
-    size: string;
-    color: string;
-    age: string;
-    width: number;
-    length: number;
     inventory: number;
     price: number;
     old_price: number;
@@ -37,11 +29,6 @@ const FIELD_CONFIG = {
     is_new: { label: "Is New", type: "boolean" },
     categories: { label: "Categories", type: "multiselect" },
     collections: { label: "Collections", type: "multiselect" },
-    size: { label: "Size", type: "select" },
-    color: { label: "Color", type: "select" },
-    age: { label: "Age Range", type: "select" },
-    width: { label: "Waist", type: "number" },
-    length: { label: "Length", type: "number" },
     inventory: { label: "Inventory", type: "number" },
     price: { label: "Price(₦)", type: "number" },
     old_price: { label: "Old Price(₦)", type: "number" },
@@ -64,11 +51,6 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
         collections: [],
         active: true,
         is_new: false,
-        size: "",
-        color: "",
-        length: 0,
-        width: 0,
-        age: "",
         price: 0,
         old_price: 0,
         inventory: 1,
@@ -121,21 +103,6 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
         if (selectedFields.has("is_new")) {
             input.is_new = product.is_new;
         }
-        if (selectedFields.has("size")) {
-            input.size = product.size;
-        }
-        if (selectedFields.has("color")) {
-            input.color = product.color;
-        }
-        if (selectedFields.has("age")) {
-            input.age = product.age;
-        }
-        if (selectedFields.has("length")) {
-            input.length = product.length;
-        }
-        if (selectedFields.has("width")) {
-            input.width = product.width;
-        }
         if (selectedFields.has("price")) {
             input.price = product.price;
         }
@@ -179,11 +146,10 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                                 <button
                                     key={field}
                                     onClick={() => toggleFieldSelection(field as FieldKey)}
-                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium cursor-pointer ${
-                                        isActive
-                                            ? "bg-primary/15 text-primary border border-primary/30 shadow-md"
-                                            : "bg-secondary text-secondary-foreground"
-                                    }`}
+                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium cursor-pointer ${isActive
+                                        ? "bg-primary/15 text-primary border border-primary/30 shadow-md"
+                                        : "bg-secondary text-secondary-foreground"
+                                        }`}
                                 >
                                     {config.label}
                                 </button>
@@ -256,132 +222,62 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                     )}
                 </div>
 
-                {(selectedFields.has("size") ||
-                    selectedFields.has("color") ||
-                    selectedFields.has("age") ||
-                    selectedFields.has("length") ||
-                    selectedFields.has("width") ||
+                {(
                     selectedFields.has("price") ||
                     selectedFields.has("old_price") ||
                     selectedFields.has("inventory")) && (
-                    <Card className="p-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            {selectedFields.has("size") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm">Size</Label>
-                                    <Select value={product.size.toString()} onValueChange={(value) => updateField("size", value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Size" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {SIZE_OPTIONS.map((size: string) => (
-                                                <SelectItem key={size} value={size}>
-                                                    {size}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )}
+                        <Card className="p-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                {selectedFields.has("price") && (
+                                    <div className="space-y-2">
+                                        <Label className="text-sm" htmlFor="price">
+                                            Price(₦)
+                                        </Label>
+                                        <Input
+                                            id="price"
+                                            placeholder="1200"
+                                            step="1"
+                                            type="number"
+                                            value={product.price || ""}
+                                            onChange={(e) => updateField("price", parseFloat(e.target.value) || 0)}
+                                        />
+                                    </div>
+                                )}
 
-                            {selectedFields.has("color") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm">Color</Label>
-                                    <Select value={product.color.toString()} onValueChange={(value) => updateField("color", value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Color" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {COLOR_OPTIONS.map((color: ColorOption) => (
-                                                <SelectItem key={color.value} value={color.value}>
-                                                    {color.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )}
+                                {selectedFields.has("old_price") && (
+                                    <div className="space-y-2">
+                                        <Label className="text-sm" htmlFor="old_price">
+                                            Old Price(₦)
+                                        </Label>
+                                        <Input
+                                            id="old_price"
+                                            placeholder="0"
+                                            step="1"
+                                            type="number"
+                                            value={product.old_price || ""}
+                                            onChange={(e) => updateField("old_price", parseFloat(e.target.value) || 0)}
+                                        />
+                                    </div>
+                                )}
 
-                            {selectedFields.has("width") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm">Width</Label>
-                                    <Input
-                                        placeholder="41"
-                                        type="number"
-                                        value={product.width || ""}
-                                        onChange={(e) => updateField("width", parseFloat(e.target.value) || 0)}
-                                    />
-                                </div>
-                            )}
-
-                            {selectedFields.has("length") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm">Length</Label>
-                                    <Input
-                                        placeholder="43"
-                                        type="number"
-                                        value={product.length || ""}
-                                        onChange={(e) => updateField("length", parseFloat(e.target.value) || 0)}
-                                    />
-                                </div>
-                            )}
-
-                            {selectedFields.has("age") && (
-                                <div className="col-span-2">
-                                    <AgeRangeSelector selectedRange={product.age} onChange={(range) => updateField("age", range)} />
-                                </div>
-                            )}
-
-                            {selectedFields.has("price") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm" htmlFor="price">
-                                        Price(₦)
-                                    </Label>
-                                    <Input
-                                        id="price"
-                                        placeholder="1200"
-                                        step="1"
-                                        type="number"
-                                        value={product.price || ""}
-                                        onChange={(e) => updateField("price", parseFloat(e.target.value) || 0)}
-                                    />
-                                </div>
-                            )}
-
-                            {selectedFields.has("old_price") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm" htmlFor="old_price">
-                                        Old Price(₦)
-                                    </Label>
-                                    <Input
-                                        id="old_price"
-                                        placeholder="0"
-                                        step="1"
-                                        type="number"
-                                        value={product.old_price || ""}
-                                        onChange={(e) => updateField("old_price", parseFloat(e.target.value) || 0)}
-                                    />
-                                </div>
-                            )}
-
-                            {selectedFields.has("inventory") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm" htmlFor="inventory">
-                                        Inventory
-                                    </Label>
-                                    <Input
-                                        id="inventory"
-                                        min="0"
-                                        placeholder="0"
-                                        type="number"
-                                        value={product.inventory}
-                                        onChange={(e) => updateField("inventory", parseInt(e.target.value) || 0)}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-                )}
+                                {selectedFields.has("inventory") && (
+                                    <div className="space-y-2">
+                                        <Label className="text-sm" htmlFor="inventory">
+                                            Inventory
+                                        </Label>
+                                        <Input
+                                            id="inventory"
+                                            min="0"
+                                            placeholder="0"
+                                            type="number"
+                                            value={product.inventory}
+                                            onChange={(e) => updateField("inventory", parseInt(e.target.value) || 0)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </Card>
+                    )}
             </div>
             <div className="sheet-footer">
                 <Button variant="destructive" onClick={onClose}>

@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_mainLayoutPublic/collections")({
         return {
             meta: [
                 ...seo({
-                    title: `Product Album | ${shopName}`,
+                    title: `Product Collections | ${shopName}`,
                     description: "Browse our full product collection.",
                     url: `${APP_URL}/collections`,
                     image: rawImage,

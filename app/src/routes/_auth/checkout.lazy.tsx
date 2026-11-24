@@ -56,7 +56,7 @@ function RouteComponent() {
                     icon={ShoppingCart}
                 />
             ) : (
-                <main className="flex overflow-hidden">
+                <main className="flex overflow-hidden h-full">
                     <CheckoutFlow cart={cart} />
                     <CheckoutSummary cart={cart} />
                 </main>

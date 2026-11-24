@@ -19,7 +19,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount, canContinue }) => {
 
     return (
         <>
-            <div className="mx-4">
+            <div className="mx-4 flex-1">
                 <BankDetails />
             </div>
             <div className="checkout-footer">

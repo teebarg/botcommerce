@@ -1,30 +1,31 @@
 import asyncio
 import time
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from typing import Any
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import redis.asyncio as redis
 import sentry_sdk
-from arq.connections import ArqRedis
-from fastapi import BackgroundTasks, FastAPI, Request, Response
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.middleware.cors import CORSMiddleware
-from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
-
 from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
 from app.core.dependencies.cache import ArqDep, CdnDep
 from app.core.logging import get_logger
-from app.lib.cache import add_cache_headers
-from app.models.generic import BulkPurchaseCreate, ContactFormCreate, NewsletterCreate
+from app.core.permissions import require_admin
+from app.lib.cache import CacheHeadersMiddleware
+from app.models.generic import (BulkPurchaseCreate, ContactFormCreate,
+                                NewsletterCreate)
 from app.prisma_client import DbDep, prisma
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.services.websocket import manager
+from arq.connections import ArqRedis
+from fastapi import BackgroundTasks, Depends, FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 logger = get_logger(__name__)
 
@@ -34,7 +35,7 @@ async def lifespan(app: FastAPI):
     await prisma.connect()
 
     app.state.redis = redis.from_url(
-        settings.REDIS_URL, decode_responses=True, max_connections=10)
+        settings.REDIS_URL, decode_responses=True, max_connections=settings.REDIS_MAX_CONNECTIONS)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
     await manager.start()
@@ -46,20 +47,24 @@ async def lifespan(app: FastAPI):
     app.state.arq_pool = ArqRedis.from_url(
         settings.BROKER_URL,
         decode_responses=True,
-        max_connections=10,
+        max_connections=settings.REDIS_MAX_CONNECTIONS,
     )
 
     yield
 
+    listener_task.cancel()
+    with suppress(asyncio.CancelledError):
+        await listener_task
     if manager.cleanup_task:
         manager.cleanup_task.cancel()
-    await prisma.disconnect()
-
-    listener_task.cancel()
-    await app.state.redis.close()
+    for closer in (app.state.arq_pool.aclose, app.state.redis.aclose, prisma.disconnect):
+        try:
+            await closer()
+        except Exception as e:
+            logger.error(f"Error during shutdown: {e}")
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
-    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
+    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE)
 
 app = FastAPI(title="Botcommerce", redirect_slashes=False,
               openapi_url="/api/openapi.json", version="0.1.0", lifespan=lifespan)
@@ -77,16 +82,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": " | ".join(errors)},
     )
 
-# # Custom middleware to capture the client host
-# class ClientHostMiddleware(BaseHTTPMiddleware):
-#     async def dispatch(self, request, call_next):
-#         client_host = request.client.host
-#         # Attach the client host to the request state
-#         request.state.client_host = client_host
-#         print(f"Client host: {client_host}")  # Log the client IP
-#         return await call_next(request)
-
-
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.critical(f"Unhandled error: {exc}", exc_info=True)
@@ -96,20 +91,37 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-class TimingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        start_time = time.time()
-        response = await call_next(request)
-        duration = time.time() - start_time
-        duration_ms = round(duration * 1000, 2)
-        logger.debug(f"{request.method} {request.url.path} - {duration_ms}ms")
+class TimingMiddleware:
+    """Pure-ASGI request timing (BaseHTTPMiddleware adds per-request overhead and
+    interferes with background tasks)."""
 
-        return response
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        start = time.perf_counter()
+        status_code = 0
+
+        async def send_wrapper(message: Message) -> None:
+            nonlocal status_code
+            if message["type"] == "http.response.start":
+                status_code = message["status"]
+            await send(message)
+
+        try:
+            await self.app(scope, receive, send_wrapper)
+        finally:
+            duration_ms = round((time.perf_counter() - start) * 1000, 2)
+            logger.debug(f"{scope['method']} {scope['path']} - {status_code} - {duration_ms}ms")
 
 
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=settings.TRUSTED_PROXY_IPS)
 app.add_middleware(TimingMiddleware)
-app.middleware("http")(add_cache_headers)
+app.add_middleware(CacheHeadersMiddleware)
 if settings.all_cors_origins:
     app.add_middleware(
         CORSMiddleware,
@@ -151,18 +163,29 @@ async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> dict[str, Any]:
 
 @app.head("/api/health")
 @app.get("/api/health")
-async def health(db: DbDep) -> dict[str, Any]:
-    postgres_ok = await db.execute_raw("SELECT 1;")
-    redis_ok = True
+async def health(db: DbDep, request: Request) -> JSONResponse:
+    postgres_ok = False
+    redis_ok = False
+    search_ok = True
+    try:
+        postgres_ok = bool(await db.query_raw("SELECT 1 AS ok"))
+    except Exception as e:
+        logger.error(f"Health check: postgres unreachable: {e}")
+    try:
+        redis_ok = bool(await request.app.state.redis.ping())
+    except Exception as e:
+        logger.error(f"Health check: redis unreachable: {e}")
+
     is_healthy = postgres_ok and redis_ok
     payload = {
         "status": "healthy" if is_healthy else "unhealthy",
         "infrastructure": {
             "postgres": "connected" if postgres_ok else "disconnected",
             "redis": "connected" if redis_ok else "disconnected",
+            "meilisearch": "connected" if search_ok else "disconnected",
         }
     }
-    return payload
+    return JSONResponse(payload, status_code=200 if is_healthy else 503)
 
 
 @app.post("/api/contact-form")

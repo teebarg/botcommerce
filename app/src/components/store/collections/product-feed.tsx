@@ -7,13 +7,12 @@ import NoProductsFound from "@/components/store/products/no-products";
 import { useEffect, useMemo, useState } from "react";
 import { ImageLightbox, useLightbox } from "@/components/image-lightbox-revamp";
 import { useFeedUi } from "@/hooks/useFeedUi";
-import { QuickOrderBar } from "../quick-order-bar";
+import { QuickOrderBar } from "@/components/store/quick-order-bar";
+import { OptionsSheet } from "@/components/store/products/options-sheet";
 import { cn } from "@/utils/cn";
 import { toSelectedItem, useQuickOrderSelection } from "@/hooks/useQuickOrderSelection";
 import { FloatingViewToggle } from "../floating-view-toggle";
 import FloatingActionDeck from "./floating-deck";
-
-const HIDE_NAV_WHILE_SELECTING = true;
 
 interface Props {
     params?: FeedQuery;
@@ -23,22 +22,26 @@ export function ProductFeed({ params }: Props) {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery(productFeedInfiniteQuery(params));
     const { open, setOpen } = useLightbox();
     const [selectedProduct, setSelectedProduct] = useState<ProductSearch | null>(null);
-    const { quick, view, setView } = useFeedUi();
+    const { view, setView } = useFeedUi({
+        defaultView: "grid",
+    });
 
-    const { items, ids, toggle, remove, clear } = useQuickOrderSelection();
+    const { items, variantIds, toggle, remove, updateQuantity, clear, isSyncing } = useQuickOrderSelection();
+    const [choosingProduct, setChoosingProduct] = useState<ProductSearch | null>(null);
 
     const products: ProductSearch[] = data.pages.flatMap((page) => page.products);
 
     const selectedItems = useMemo(() => {
-        const liveById = new Map(products.map((p) => [p.id, p]));
+        const liveById = new Map(products.map((p) => [p.slug, p]));
         return items.flatMap((item) => {
-            const live = liveById.get(item.id);
+            const live = liveById.get(item.slug);
             if (!live) return [item];
-            return live.in_stock ? [toSelectedItem(live)] : [];
+            // Keep cart price/quantity/variant authoritative; enrich only the product image/id.
+            return [{ ...item, id: live.id, image: live.image || item.image }];
         });
     }, [items, products]);
 
-    const hideNav = HIDE_NAV_WHILE_SELECTING && quick && selectedItems.length > 0;
+    const hideNav = selectedItems.length > 0;
     useEffect(() => {
         if (!hideNav) return;
         const root = document.documentElement;
@@ -61,29 +64,41 @@ export function ProductFeed({ params }: Props) {
         <>
             <FloatingViewToggle view={view} onChange={setView} />
             <FloatingActionDeck />
-            <div className={cn(quick && selectedItems.length > 0 && "pb-[calc(6rem+var(--bottom-nav-h,0px))]")}>
+            <div className={cn(selectedItems.length > 0 && "pb-[calc(7rem+var(--bottom-nav-h,0px))]")}>
+                <p className="mx-2 mb-2 rounded-lg bg-muted/70 px-3 py-2 text-xs text-muted-foreground">
+                    Tap to add to cart · Hold an item for details
+                </p>
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
                     <div
                         className={cn(
-                            "grid md:grid-cols-3 lg:grid-cols-4",
-                            quick ? "" : "gap-1.5 md:gap-2",
+                            "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-2 gap-1 px-0.5",
                             view === "list" ? "grid-cols-1" : "grid-cols-2"
                         )}
                     >
-                        {products.map((product: ProductSearch) => (
+                        {products.map((product: ProductSearch, index: number) => (
                             <ProductCard
                                 key={product.id}
                                 product={product}
+                                priority={index < 4}
                                 onClick={() => handleProductClick(product)}
-                                selectable={quick}
-                                selected={ids.has(product.id)}
+                                selected={product.variants?.some((variant) => variantIds.has(variant.id)) ?? false}
                                 onSelect={() => toggle(toSelectedItem(product))}
+                                onChoose={() => setChoosingProduct(product)}
                             />
                         ))}
                     </div>
                 </InfiniteList>
             </div>
-            {quick && <QuickOrderBar items={selectedItems} onRemove={remove} onClear={clear} onSent={clear} />}
+            <QuickOrderBar items={selectedItems} onRemove={remove} onQuantityChange={updateQuantity} onClear={clear} isSyncing={isSyncing} />
+            <OptionsSheet
+                product={choosingProduct}
+                open={!!choosingProduct}
+                onOpenChange={(next) => !next && setChoosingProduct(null)}
+                confirmLabel="Add to cart"
+                showWhatsApp={false}
+                selectedIds={variantIds}
+                onConfirm={(variant) => { if (choosingProduct) void toggle(toSelectedItem(choosingProduct, variant)); }}
+            />
             <ImageLightbox
                 images={selectedProduct?.images?.map((i: string, idx: number) => ({ id: idx, image: i })) || []}
                 open={open}

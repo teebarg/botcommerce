@@ -14,6 +14,7 @@ import { ReactElement } from "react";
 import OrderSummary from "@/components/store/orders/order-summary";
 import ImageLightbox from "@/components/image-lightbox";
 import { cn } from "@/utils/cn";
+import { variantAttributes } from "@/lib/variant";
 
 interface OrderDetailsProps {
     order: Order;
@@ -83,13 +84,7 @@ const OrderItemCard: React.FC<{ item: OrderItem; orderId: number, isPaid: boolea
         });
     };
 
-    const variantText = [
-        item.variant?.size && `S: ${item.variant.size}`,
-        item.variant?.color && `Color: ${item.variant.color}`,
-        item.variant?.width && `W: ${item.variant.width}`,
-        item.variant?.length && `L: ${item.variant.length}`,
-        item.variant?.age && `Age: ${item.variant.age}`,
-    ].filter(Boolean).join(" · ");
+    const variantText = item.variant ? Object.entries(variantAttributes(item.variant)).map(([name, value]) => `${name}: ${value}`).join(" · ") : "";
 
     const outOfStock = item.variant?.inventory < 1
 
