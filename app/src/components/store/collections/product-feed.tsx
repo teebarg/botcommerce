@@ -22,7 +22,9 @@ export function ProductFeed({ params }: Props) {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery(productFeedInfiniteQuery(params));
     const { open, setOpen } = useLightbox();
     const [selectedProduct, setSelectedProduct] = useState<ProductSearch | null>(null);
-    const { quick, view, setView } = useFeedUi();
+    const { quick, view, setView } = useFeedUi({
+        defaultView: "list",
+    });
 
     const { items, ids, variantIds, toggle, remove, clear } = useQuickOrderSelection();
     const [choosingProduct, setChoosingProduct] = useState<ProductSearch | null>(null);

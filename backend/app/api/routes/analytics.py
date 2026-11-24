@@ -64,7 +64,7 @@ async def record_event(
     request: Request, payload: EventIn, cache_srv: CacheDep, background_tasks: BackgroundTasks
 ):
     if payload.event not in ALLOWED_EVENTS:
-        return Message(message="success")  # ignore silently; don't create keys for unknown events
+        return Message(message="success")
 
     async def log_event():
         try:

@@ -39,7 +39,6 @@ export function QuickOrderBar({
     const barRef = useRef<HTMLDivElement>(null);
     const hasItems = items.length > 0;
 
-    // Handle entrance and exit animations
     useEffect(() => {
         if (hasItems) {
             setVisible(true);

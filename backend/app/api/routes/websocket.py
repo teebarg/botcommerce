@@ -64,7 +64,7 @@ async def websocket(ws: WebSocket) -> None:
                 if message_type == "init":
                     session = await _authenticated_session(ws)
                     if not session or not session.get("id"):
-                        continue  # not logged in: stay a guest
+                        continue
 
                     user_id = str(session["id"])
                     metadata = {

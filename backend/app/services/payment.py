@@ -137,7 +137,6 @@ class PaymentService:
         product_ids: set[int] = set()
 
         async with self.db.tx() as tx:
-            # Atomic claim: only one concurrent caller flips the payment to SUCCESS.
             claimed = await tx.payment.update_many(
                 where={"id": payment.id, "status": {"not": "SUCCESS"}},
                 data={"status": "SUCCESS"},
@@ -217,5 +216,4 @@ class PaymentService:
             try:
                 await self.queue.enqueue_job(job, order_id=order_id)
             except Exception as e:
-                # Payment is committed; a retry would see SUCCESS and skip, so log loudly instead.
                 logger.critical(f"Order {order_id} paid but job '{job}' was not queued: {e}")

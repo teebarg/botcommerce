@@ -309,7 +309,7 @@
     }
 
     .checkout-footer {
-        @apply flex justify-end pt-4 pb-[var(--sab)+1rem] px-4 sticky bottom-0 border-t border-border bg-background mt-4 md:border-t-0;
+        @apply flex justify-end pt-4 pb-[calc(var(--sab)+1rem)] px-4 sticky bottom-0 border-t border-border bg-background mt-4 md:border-t-0;
     }
 
     .drawer-safe {

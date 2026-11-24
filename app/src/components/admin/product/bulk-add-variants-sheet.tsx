@@ -19,7 +19,7 @@ const COMMON_ATTRIBUTES = [
     "Age",
     "Length",
     "Waist",
-    
+
 ];
 const keyOf = (attributes: Record<string, string>) => Object.entries(attributes).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${key}:${value}`).join("|");
 
@@ -47,7 +47,6 @@ export function BulkAddVariantsSheet({ productIds, onClose }: Props) {
     // attribute has no values yet or there are too many combinations.
     const inSync = optionsComplete && combinationCount <= MAX_VARIANTS && variants.length === combinationCount;
 
-    // Every change to the attributes updates the combinations straight away.
     // Matching combinations keep what was already entered; new ones start from the "set for all" values.
     const rebuild = (nextOptions: ProductOption[]) => {
         setOptions(nextOptions);
@@ -74,10 +73,10 @@ export function BulkAddVariantsSheet({ productIds, onClose }: Props) {
     const removeValue = (name: string, value: string) => {
         rebuild(options.map((option) => option.name === name ? { ...option, values: option.values.filter((item) => item !== value) } : option));
     };
-    // "Set for all": fills every row now and is used for rows added later.
+
     const setForAll = (patch: Partial<EditableVariant>) => setVariants((previous) => previous.map((variant) => ({ ...variant, ...patch })));
     const updateVariant = (index: number, patch: Partial<EditableVariant>) => setVariants((previous) => previous.map((variant, i) => i === index ? { ...variant, ...patch } : variant));
-    // A combination with quantity 0 is just out of stock, so it needs no price of its own.
+
     const fallbackPrice = variants.find((variant) => variant.price > 0)?.price;
     const canSubmit = inSync && confirmSharedStructure && fallbackPrice !== undefined && variants.every((variant) => variant.inventory >= 0 && (variant.inventory === 0 || variant.price > 0));
 
@@ -86,9 +85,7 @@ export function BulkAddVariantsSheet({ productIds, onClose }: Props) {
             await mutateAsync({ productIds, input: { options, variants: variants.map((variant) => ({ ...variant, price: variant.price > 0 ? variant.price : (fallbackPrice as number) })) } });
             toast.success(`Variant structure applied to ${productIds.length} products`);
             onClose();
-        } catch {
-            // Mutation hook displays the API error.
-        }
+        } catch { }
     };
 
     return (

@@ -10,7 +10,6 @@ const matchesSelection = (variant: ProductVariant, selected: Selection, optionNa
     return Object.entries(selected).every(([name, value]) => !optionNames.includes(name) || name === except || attributes[name] === value);
 };
 
-// Shared by the product page and the product card sheet so both behave the same.
 export function useVariantSelection(product: Product | ProductSearch, initial?: ProductVariant | null) {
     const options = useMemo(() => productOptions(product), [product]);
     const variants = useMemo(() => product.variants ?? [], [product]);

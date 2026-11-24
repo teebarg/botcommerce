@@ -1,97 +1,13 @@
 import { useState } from "react";
 import { Check, ShoppingBag } from "lucide-react";
 import { ProductSearch, ProductVariant } from "@/schemas";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
-import { Badge } from "@/components/ui/badge";
-import { VariantPicker, useVariantSelection } from "@/components/products/variant-picker";
-import { currency } from "@/utils";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useCart } from "@/providers/cart-provider";
-import { activeVariants, variantAvailable, defaultVariant, getPriceInfo, handleWhatsAppPurchase, productOptions } from "@/lib/variant";
+import { variantAvailable, defaultVariant, handleWhatsAppPurchase, productOptions } from "@/lib/variant";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/providers/store-provider";
 import { WhatsAppIcon } from "@/components/card/icons";
-
-const LOW_STOCK = 5;
-
-const joinNames = (names: string[]) => names.map((name) => name.toLowerCase()).join(" and ");
-
-function OptionsSheetBody({ product, onAdded }: { product: ProductSearch; onAdded: () => void }) {
-    const { addToCart } = useCart();
-    const { whatsapp } = useConfig();
-    const available = activeVariants(product);
-    // Only one thing can be bought: nothing to choose, so preselect it.
-    const { options, variants, selected, select, selectedVariant, missing } = useVariantSelection(product, available.length === 1 ? available[0] : null);
-    const { minPrice } = getPriceInfo(product);
-
-    const inStock = !!selectedVariant && selectedVariant.inventory > 0;
-    const hasDiscount = !!selectedVariant?.old_price && selectedVariant.old_price > selectedVariant.price;
-
-    let status: React.ReactNode = <span className="text-sm text-muted-foreground">Select {joinNames(missing)} to see availability</span>;
-    if (!missing.length && !selectedVariant) status = <span className="text-sm text-destructive">This combination isn't available</span>;
-    if (selectedVariant) {
-        status =
-            selectedVariant.inventory <= 0 ? (
-                <Badge variant="destructive">Out of stock</Badge>
-            ) : selectedVariant.inventory <= LOW_STOCK ? (
-                <Badge variant="destructive">Only {selectedVariant.inventory} left</Badge>
-            ) : (
-                <Badge variant="success">In stock</Badge>
-            );
-    }
-
-    const add = () => {
-        if (!selectedVariant || !inStock) return;
-        addToCart(selectedVariant.id, 1);
-        onAdded();
-    };
-
-    const orderOnWhatsApp = () => {
-        if (selectedVariant && inStock && whatsapp) handleWhatsAppPurchase(selectedVariant, product.slug, whatsapp);
-    };
-
-    return (
-        <div className="mx-auto flex w-full max-w-md flex-col">
-            <div className="flex items-center gap-4 px-5 pb-4 pt-5">
-                <img src={product.image} alt="" className="h-20 w-20 shrink-0 rounded-2xl border border-border bg-muted object-cover" />
-                <div className="min-w-0 flex-1">
-                    <DrawerTitle className="line-clamp-2 text-left text-base font-semibold leading-snug">{product.name}</DrawerTitle>
-                    <DrawerDescription className="sr-only">Choose your options, then add this product to your cart.</DrawerDescription>
-                    <div className="mt-1.5 flex items-baseline gap-2" aria-live="polite">
-                        <span className="text-xl font-semibold tracking-tight">{selectedVariant ? currency(selectedVariant.price) : `From ${currency(minPrice)}`}</span>
-                        {hasDiscount && <span className="text-sm text-muted-foreground line-through">{currency(selectedVariant!.old_price!)}</span>}
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-h-[50vh] space-y-5 overflow-y-auto border-t border-border px-5 py-5">
-                <VariantPicker options={options} variants={variants} selected={selected} onSelect={select} />
-                <div className="min-h-6" aria-live="polite">
-                    {status}
-                </div>
-            </div>
-
-            <div className="flex items-center gap-2 border-t border-border px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
-                <button
-                    type="button"
-                    onClick={orderOnWhatsApp}
-                    disabled={!inStock}
-                    aria-label="Order through WhatsApp"
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                    <WhatsAppIcon className="h-7 w-7 text-success-foreground" />
-                </button>
-                <Button
-                    type="button"
-                    onClick={add}
-                    disabled={!inStock}
-                    className="h-12 flex-1 rounded-xl bg-foreground text-base text-background hover:bg-foreground/90"
-                >
-                    {inStock ? `Add to cart · ${currency(selectedVariant!.price)}` : missing.length ? `Select ${joinNames(missing)}` : "Unavailable"}
-                </Button>
-            </div>
-        </div>
-    );
-}
+import { ProductOptionsSheet } from "./product-options-sheet";
 
 export function AddToCartButton({ product, productVariant }: { product: ProductSearch; productVariant?: ProductVariant | undefined }) {
     const { addToCart } = useCart();
@@ -103,6 +19,12 @@ export function AddToCartButton({ product, productVariant }: { product: ProductS
     const flashAdded = () => {
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1600);
+    };
+
+    const add = (variant: ProductVariant) => {
+        addToCart(variant.id, 1);
+        setSheetOpen(false);
+        flashAdded();
     };
 
     const onWhatsApp = (e: React.MouseEvent) => {
@@ -149,12 +71,10 @@ export function AddToCartButton({ product, productVariant }: { product: ProductS
                 </Button>
                 <Drawer open={sheetOpen} onOpenChange={setSheetOpen}>
                     <DrawerContent className="rounded-t-3xl">
-                        <OptionsSheetBody
+                        <ProductOptionsSheet
                             product={product}
-                            onAdded={() => {
-                                setSheetOpen(false);
-                                flashAdded();
-                            }}
+                            confirmLabel="Add to cart"
+                            onConfirm={add}
                         />
                     </DrawerContent>
                 </Drawer>
@@ -167,8 +87,7 @@ export function AddToCartButton({ product, productVariant }: { product: ProductS
             <Button
                 onClick={(event) => {
                     event.preventDefault();
-                    addToCart(selected.id, 1);
-                    flashAdded();
+                    add(selected);
                 }}
                 aria-label="Add to cart"
                 variant="outline"

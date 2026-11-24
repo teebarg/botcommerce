@@ -64,7 +64,6 @@ async def lifespan(app: FastAPI):
             logger.error(f"Error during shutdown: {e}")
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
-    # enable_tracing=True samples 100% of requests; sample a fraction instead.
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE)
 
 app = FastAPI(title="Botcommerce", redirect_slashes=False,

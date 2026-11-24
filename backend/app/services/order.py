@@ -193,47 +193,47 @@ class OrderService:
                 if cart.shipping_address_id:
                     data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
-            try:
-                new_order = await tx.order.create(data=data)
-            except Exception as e:
-                logger.error(f"Failed to create order: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+                try:
+                    new_order = await tx.order.create(data=data)
+                except Exception as e:
+                    logger.error(f"Failed to create order: {str(e)}")
+                    raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-            await tx.ordertimeline.create(
-                data={
-                    "order": {"connect": {"id": new_order.id}},
-                    "from_status": "PENDING",
-                    "to_status": "PENDING",
-                    "message": "Order placed",
-                }
-            )
-            await tx.cartitem.delete_many(where={"cart_id": cart.id})
-            await tx.cart.update(
-                where={"id": cart.id},
-                data={
-                    "coupon_id": None,
-                    "coupon_code": None,
-                    "discount_amount": 0,
-                },
-            )
-            await tx.payment.create(
-                data={
-                    "order": {"connect": {"id": new_order.id}},
-                    "reference": f"{new_order.payment_method}-{new_order.order_number}",
-                    "transaction_id": f"{new_order.payment_method}-{new_order.order_number}",
-                    "amount": new_order.total,
-                    "status": "PENDING",
-                    "payment_method": new_order.payment_method,
-                }
-            )
-
-            if cart.coupon_id:
-                await self.coupon_srv.increment_coupon_usage(
-                    coupon_id=cart.coupon_id,
-                    user_id=user_id,
-                    discount_amount=cart_totals["discount_amount"],
-                    tx=tx,
+                await tx.ordertimeline.create(
+                    data={
+                        "order": {"connect": {"id": new_order.id}},
+                        "from_status": "PENDING",
+                        "to_status": "PENDING",
+                        "message": "Order placed",
+                    }
                 )
+                await tx.cartitem.delete_many(where={"cart_id": cart.id})
+                await tx.cart.update(
+                    where={"id": cart.id},
+                    data={
+                        "coupon_id": None,
+                        "coupon_code": None,
+                        "discount_amount": 0,
+                    },
+                )
+                await tx.payment.create(
+                    data={
+                        "order": {"connect": {"id": new_order.id}},
+                        "reference": f"{new_order.payment_method}-{new_order.order_number}",
+                        "transaction_id": f"{new_order.payment_method}-{new_order.order_number}",
+                        "amount": new_order.total,
+                        "status": "PENDING",
+                        "payment_method": new_order.payment_method,
+                    }
+                )
+
+                if cart.coupon_id:
+                    await self.coupon_srv.increment_coupon_usage(
+                        coupon_id=cart.coupon_id,
+                        user_id=user_id,
+                        discount_amount=cart_totals["discount_amount"],
+                        tx=tx,
+                    )
         except HTTPException:
             raise
         except Exception as e:
@@ -282,7 +282,6 @@ class OrderService:
 
         async with self.db.tx() as tx:
             if variant_id is not None and order_item.order.payment_status == "SUCCESS":
-                # Atomic increment (a read-then-write here would lose concurrent sales/returns).
                 await tx.productvariant.update_many(
                     where={"id": variant_id},
                     data={"inventory": {"increment": quantity}, "status": "IN_STOCK"},

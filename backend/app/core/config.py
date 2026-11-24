@@ -56,7 +56,7 @@ class Settings(BaseSettings):
 
     # Comma-separated IPs/CIDRs of the reverse proxy / load balancer allowed to set
     # X-Forwarded-For. "*" trusts every caller (clients can then spoof their IP and
-    # bypass IP-based rate limits). Set this to your proxy's address in production.
+    # bypass IP-based rate limits).
     TRUSTED_PROXY_IPS: str = "*"
 
     SMTP_TLS: bool = True

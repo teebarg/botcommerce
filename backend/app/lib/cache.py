@@ -76,10 +76,8 @@ async def add_cache_headers(
 
 
 class CacheHeadersMiddleware:
-    """Pure-ASGI replacement for add_cache_headers (no BaseHTTPMiddleware overhead).
-
-    Handlers stash cache metadata on request.state (== scope["state"]); this copies it
-    onto the response headers as the response starts.
+    """Handlers stash cache metadata on request.state (== scope["state"]); this copies it
+        onto the response headers as the response starts.
     """
 
     def __init__(self, app: ASGIApp) -> None:
@@ -103,7 +101,6 @@ class CacheHeadersMiddleware:
         await self.app(scope, receive, send_with_headers)
 
 
-# Cloudflare limits how many URLs one purge request may carry.
 _PURGE_BATCH = 30
 
 
@@ -119,7 +116,6 @@ async def purge_cdn_urls(*paths: str) -> None:
         return
 
     # Build the specific cache keys Cloudflare is tracking
-    # Cloudflare needs absolute URLs (scheme included); settings.DOMAIN is a bare host.
     purge_files = []
     for p in dict.fromkeys(paths):
         url: str = f"{settings.server_host}{p}"

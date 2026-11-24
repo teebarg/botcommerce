@@ -15,7 +15,7 @@ export default function OrderItemComponent({ item }: { item: OrderItem }) {
                 />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{item.name}</p>
+                <p className="text-sm font-medium truncate max-w-60">{item.name}</p>
                 {variantText && <p className="text-xs text-muted-foreground mt-0.5">{variantText}</p>}
                 <p className="text-xs text-muted-foreground mt-1">
                     {item.quantity} × {currency(Number(item.price) || 0)}

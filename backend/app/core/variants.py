@@ -2,8 +2,7 @@
 
 A variant is "removed" when its attributes no longer fit the product's saved
 options (for example the admin deleted the choice "Red"). Removed variants stay
-in the database so order and cart history keep working, but they must never be
-shown or sold.
+in the database so order and cart history keep working.
 """
 from typing import Any, Iterable
 

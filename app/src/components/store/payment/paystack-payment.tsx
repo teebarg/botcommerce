@@ -20,7 +20,7 @@ export function PaystackPayment({ amount, canContinue }: PaystackPaymentProps) {
 
     return (
         <>
-            <div className="px-4 mt-4">
+            <div className="px-4 mt-4 flex-1">
                 <div className="rounded-xl bg-card p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <ShieldCheck className="h-4 w-4 text-primary" />
